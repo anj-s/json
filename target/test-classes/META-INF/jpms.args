@@ -1,0 +1,4 @@
+--patch-module
+dev.mccue.json=_
+--add-reads
+dev.mccue.json=ALL-UNNAMED
