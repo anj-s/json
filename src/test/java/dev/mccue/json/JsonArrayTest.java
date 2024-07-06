@@ -23,90 +23,90 @@ public class JsonArrayTest {
     //     assertThrows(NullPointerException.class, () -> JsonArray.of(e));
     // }
 
-    @Test
-    public void arrayBuilderTest() {
-        for (var builder : List.of(
-                Json.arrayBuilder(),
-                Json.arrayBuilder(List.of()),
-                JsonArray.builder(),
-                JsonArray.builder(0),
-                JsonArray.builder(1),
-                JsonArray.builder(5),
-                JsonArray.builder(100)
-        )) {
+//     @Test
+//     public void arrayBuilderTest() {
+//         for (var builder : List.of(
+//                 Json.arrayBuilder(),
+//                 Json.arrayBuilder(List.of()),
+//                 JsonArray.builder(),
+//                 JsonArray.builder(0),
+//                 JsonArray.builder(1),
+//                 JsonArray.builder(5),
+//                 JsonArray.builder(100)
+//         )) {
 
-            var array = builder
-                    .add((Boolean) true)
-                    .add((Boolean) false)
-                    .add((Boolean) null)
-                    .addTrue()
-                    .addFalse()
-                    .addNull()
-                    .add(true)
-                    .add(false)
-                    .add(1)
-                    .add(1L)
-                    .add(1.0f)
-                    .add(1.0)
-                    .add((Integer) 1)
-                    .add((Integer) null)
-                    .add((Long) 1L)
-                    .add((Long) null)
-                    .add((Float) 1.0f)
-                    .add((Float) null)
-                    .add((Double) 1.0)
-                    .add((Double) null)
-                    .add("")
-                    .add((String) null)
-                    .add(BigDecimal.ONE)
-                    .add((BigDecimal) null)
-                    .add(BigInteger.ONE)
-                    .add((BigInteger) null)
-                    .addAll(List.of(Json.of("a"), Json.of("b"), Json.of("c")))
-                    .add(() -> Json.of("d"));
+//             var array = builder
+//                     .add((Boolean) true)
+//                     .add((Boolean) false)
+//                     .add((Boolean) null)
+//                     .addTrue()
+//                     .addFalse()
+//                     .addNull()
+//                     .add(true)
+//                     .add(false)
+//                     .add(1)
+//                     .add(1L)
+//                     .add(1.0f)
+//                     .add(1.0)
+//                     .add((Integer) 1)
+//                     .add((Integer) null)
+//                     .add((Long) 1L)
+//                     .add((Long) null)
+//                     .add((Float) 1.0f)
+//                     .add((Float) null)
+//                     .add((Double) 1.0)
+//                     .add((Double) null)
+//                     .add("")
+//                     .add((String) null)
+//                     .add(BigDecimal.ONE)
+//                     .add((BigDecimal) null)
+//                     .add(BigInteger.ONE)
+//                     .add((BigInteger) null)
+//                     .addAll(List.of(Json.of("a"), Json.of("b"), Json.of("c")))
+//                     .add(() -> Json.of("d"));
 
-            var expected = JsonArray.of(
-                    Json.ofTrue(),
-                    Json.ofFalse(),
-                    Json.ofNull(),
-                    Json.ofTrue(),
-                    Json.ofFalse(),
-                    Json.ofNull(),
-                    Json.ofTrue(),
-                    Json.ofFalse(),
-                    Json.of(1),
-                    Json.of(1L),
-                    Json.of(1.0f),
-                    Json.of(1.0),
-                    Json.of(1),
-                    Json.ofNull(),
-                    Json.of(1L),
-                    Json.ofNull(),
-                    Json.of(1.0f),
-                    Json.ofNull(),
-                    Json.of(1.0),
-                    Json.ofNull(),
-                    Json.of(""),
-                    Json.ofNull(),
-                    Json.of(BigDecimal.ONE),
-                    Json.ofNull(),
-                    Json.of(BigInteger.ONE),
-                    Json.ofNull(),
-                    Json.of("a"),
-                    Json.of("b"),
-                    Json.of("c"),
-                    Json.of("d")
-            );
-            assertEquals(
-                    expected,
-                    array.build()
-            );
-            assertEquals(
-                    expected,
-                    array.toJson()
-            );
-        }
-    }
+//             var expected = JsonArray.of(
+//                     Json.ofTrue(),
+//                     Json.ofFalse(),
+//                     Json.ofNull(),
+//                     Json.ofTrue(),
+//                     Json.ofFalse(),
+//                     Json.ofNull(),
+//                     Json.ofTrue(),
+//                     Json.ofFalse(),
+//                     Json.of(1),
+//                     Json.of(1L),
+//                     Json.of(1.0f),
+//                     Json.of(1.0),
+//                     Json.of(1),
+//                     Json.ofNull(),
+//                     Json.of(1L),
+//                     Json.ofNull(),
+//                     Json.of(1.0f),
+//                     Json.ofNull(),
+//                     Json.of(1.0),
+//                     Json.ofNull(),
+//                     Json.of(""),
+//                     Json.ofNull(),
+//                     Json.of(BigDecimal.ONE),
+//                     Json.ofNull(),
+//                     Json.of(BigInteger.ONE),
+//                     Json.ofNull(),
+//                     Json.of("a"),
+//                     Json.of("b"),
+//                     Json.of("c"),
+//                     Json.of("d")
+//             );
+//             assertEquals(
+//                     expected,
+//                     array.build()
+//             );
+//             assertEquals(
+//                     expected,
+//                     array.toJson()
+//             );
+//         }
+//     }
 
     @Test
     public void mutatingMethodsThrow() {

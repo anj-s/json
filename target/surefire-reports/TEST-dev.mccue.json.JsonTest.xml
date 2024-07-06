@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="11" failures="0" name="dev.mccue.json.JsonTest" time="0.05" errors="0" skipped="0">
+<testsuite tests="11" failures="0" name="dev.mccue.json.JsonTest" time="0.032" errors="0" skipped="0">
   <properties>
     <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
     <property name="java.vm.version" value="21.0.2+13-58"/>
@@ -58,14 +58,14 @@
     <property name="sun.cpu.endian" value="little"/>
   </properties>
   <testcase classname="dev.mccue.json.JsonTest" name="dev.mccue.json.JsonTest.testNullOfMethods" time="0"/>
-  <testcase classname="dev.mccue.json.JsonTest" name="dev.mccue.json.JsonTest.testOfCollection" time="0.025"/>
-  <testcase classname="dev.mccue.json.JsonTest" name="dev.mccue.json.JsonTest.testOfCollectionEncodable" time="0.012"/>
-  <testcase classname="dev.mccue.json.JsonTest" name="dev.mccue.json.JsonTest.testOfMap" time="0.003"/>
-  <testcase classname="dev.mccue.json.JsonTest" name="dev.mccue.json.JsonTest.testOfMapEncoder" time="0.001"/>
+  <testcase classname="dev.mccue.json.JsonTest" name="dev.mccue.json.JsonTest.testOfCollection" time="0.004"/>
+  <testcase classname="dev.mccue.json.JsonTest" name="dev.mccue.json.JsonTest.testOfCollectionEncodable" time="0.004"/>
+  <testcase classname="dev.mccue.json.JsonTest" name="dev.mccue.json.JsonTest.testOfMap" time="0.016"/>
+  <testcase classname="dev.mccue.json.JsonTest" name="dev.mccue.json.JsonTest.testOfMapEncoder" time="0.003"/>
   <testcase classname="dev.mccue.json.JsonTest" name="dev.mccue.json.JsonTest.testOfEncodable" time="0.001"/>
   <testcase classname="dev.mccue.json.JsonTest" name="dev.mccue.json.JsonTest.testOfNumbers" time="0.003"/>
-  <testcase classname="dev.mccue.json.JsonTest" name="dev.mccue.json.JsonTest.testOfString" time="0.001"/>
-  <testcase classname="dev.mccue.json.JsonTest" name="dev.mccue.json.JsonTest.testTrueRepr" time="0.002"/>
-  <testcase classname="dev.mccue.json.JsonTest" name="dev.mccue.json.JsonTest.testFalseRepr" time="0.002"/>
+  <testcase classname="dev.mccue.json.JsonTest" name="dev.mccue.json.JsonTest.testOfString" time="0"/>
+  <testcase classname="dev.mccue.json.JsonTest" name="dev.mccue.json.JsonTest.testTrueRepr" time="0.001"/>
+  <testcase classname="dev.mccue.json.JsonTest" name="dev.mccue.json.JsonTest.testFalseRepr" time="0"/>
   <testcase classname="dev.mccue.json.JsonTest" name="dev.mccue.json.JsonTest.testNullRepr" time="0"/>
 </testsuite>

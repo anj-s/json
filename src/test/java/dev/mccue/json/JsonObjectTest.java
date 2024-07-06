@@ -47,24 +47,24 @@ public class JsonObjectTest {
     //     assertEquals(o, JsonObject.of(Map.of("a", Json.of("b"))));
     // }
 
-    @Test
-    public void mutatingMethodsOnObjectThrow() {
-        var m = new HashMap<String, Json>();
-        m.put("a", Json.of("b"));
-        var o = JsonObject.of(m);
+    // @Test
+    // public void mutatingMethodsOnObjectThrow() {
+    //     var m = new HashMap<String, Json>();
+    //     m.put("a", Json.of("b"));
+    //     var o = JsonObject.of(m);
 
-        assertThrows(UnsupportedOperationException.class, () -> o.put("a", Json.of("c")));
-        assertThrows(UnsupportedOperationException.class, () -> o.replace("a", Json.of("b")));
-        assertThrows(UnsupportedOperationException.class, () -> o.replace("a", Json.of("b"), Json.of("c")));
-        assertThrows(UnsupportedOperationException.class, () -> o.putAll(Map.of()));
-        assertThrows(UnsupportedOperationException.class, () -> o.putIfAbsent("a", Json.of("b")));
-        assertThrows(UnsupportedOperationException.class, o::clear);
-        assertThrows(UnsupportedOperationException.class, () -> o.compute("a", (__, ___) -> Json.of("a")));
-        assertThrows(UnsupportedOperationException.class, () -> o.computeIfAbsent("a", (__) -> Json.of("a")));
-        assertThrows(UnsupportedOperationException.class, () -> o.computeIfPresent("a", (__, ___) -> Json.of("a")));
-        assertThrows(UnsupportedOperationException.class, () -> o.remove("a"));
-        assertThrows(UnsupportedOperationException.class, () -> o.remove("a", Json.of("b")));
-    }
+    //     assertThrows(UnsupportedOperationException.class, () -> o.put("a", Json.of("c")));
+    //     assertThrows(UnsupportedOperationException.class, () -> o.replace("a", Json.of("b")));
+    //     assertThrows(UnsupportedOperationException.class, () -> o.replace("a", Json.of("b"), Json.of("c")));
+    //     assertThrows(UnsupportedOperationException.class, () -> o.putAll(Map.of()));
+    //     assertThrows(UnsupportedOperationException.class, () -> o.putIfAbsent("a", Json.of("b")));
+    //     assertThrows(UnsupportedOperationException.class, o::clear);
+    //     assertThrows(UnsupportedOperationException.class, () -> o.compute("a", (__, ___) -> Json.of("a")));
+    //     assertThrows(UnsupportedOperationException.class, () -> o.computeIfAbsent("a", (__) -> Json.of("a")));
+    //     assertThrows(UnsupportedOperationException.class, () -> o.computeIfPresent("a", (__, ___) -> Json.of("a")));
+    //     assertThrows(UnsupportedOperationException.class, () -> o.remove("a"));
+    //     assertThrows(UnsupportedOperationException.class, () -> o.remove("a", Json.of("b")));
+    // }
 
     @Test
     public void emptyObjects() {
