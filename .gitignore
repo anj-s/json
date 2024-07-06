@@ -7,7 +7,7 @@
 .classpath
 .settings
 
-target/
+# target/
 .DS_Store
 
 .clj-kondo/*

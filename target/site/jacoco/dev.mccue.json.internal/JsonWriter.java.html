@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonWriter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">json</a> &gt; <a href="index.source.html" class="el_package">dev.mccue.json.internal</a> &gt; <span class="el_source">JsonWriter.java</span></div><h1>JsonWriter.java</h1><pre class="source lang-java linenums">package dev.mccue.json.internal;
+
+import dev.mccue.json.*;
+
+import java.io.IOException;
+import java.util.IdentityHashMap;
+
+public final class JsonWriter {
+<span class="fc" id="L9">    public JsonWriter() {}</span>
+
+    private static final short[] CODEPOINT_DECODER;
+
+    static {
+<span class="fc" id="L14">        CODEPOINT_DECODER = new short[128];</span>
+<span class="fc bfc" id="L15" title="All 2 branches covered.">        for (int i = 0; i &lt; 128; i++) {</span>
+<span class="fc bfc" id="L16" title="All 8 branches covered.">            CODEPOINT_DECODER[i] = switch (i) {</span>
+<span class="fc" id="L17">                case '&quot;', '\\' -&gt; 1;</span>
+<span class="fc" id="L18">                case '/' -&gt; 2;</span>
+<span class="fc" id="L19">                case '\b' -&gt; 3;</span>
+<span class="fc" id="L20">                case '\f' -&gt; 4;</span>
+<span class="fc" id="L21">                case '\n' -&gt; 5;</span>
+<span class="fc" id="L22">                case '\r' -&gt; 6;</span>
+<span class="fc" id="L23">                case '\t' -&gt; 7;</span>
+                default -&gt; {
+<span class="fc bfc" id="L25" title="All 2 branches covered.">                    if (i &lt; 32) {</span>
+<span class="fc" id="L26">                        yield 8;</span>
+                    }
+                    else {
+<span class="fc" id="L29">                        yield 0;</span>
+                    }
+                }
+            };
+        }
+<span class="fc" id="L34">    }</span>
+
+    private static void emitHexString(Appendable out, char cp) throws IOException {
+<span class="nc" id="L37">        out.append(&quot;\\u&quot;);</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">        if (cp &lt; 16) {</span>
+<span class="nc" id="L39">            out.append(&quot;000&quot;);</span>
+        }
+<span class="nc bnc" id="L41" title="All 2 branches missed.">        else if (cp &lt; 256) {</span>
+<span class="nc" id="L42">            out.append(&quot;00&quot;);</span>
+        }
+<span class="nc bnc" id="L44" title="All 2 branches missed.">        else if (cp &lt; 4096) {</span>
+<span class="nc" id="L45">            out.append(&quot;0&quot;);</span>
+        }
+
+<span class="nc" id="L48">        out.append(Integer.toHexString(cp));</span>
+<span class="nc" id="L49">    }</span>
+
+    public static void writeString(CharSequence s, Appendable out, OptionsWithIndentDepth options) throws IOException {
+<span class="fc" id="L52">        out.append('&quot;');</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">        for (int i = 0; i &lt; s.length(); i++) {</span>
+<span class="fc" id="L54">            char cp = s.charAt(i);</span>
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">            if (cp &lt; 128) {</span>
+<span class="pc bpc" id="L56" title="2 of 10 branches missed.">                switch (CODEPOINT_DECODER[cp]) {</span>
+<span class="fc" id="L57">                    case 0 -&gt; out.append(cp);</span>
+                    case 1 -&gt; {
+<span class="fc" id="L59">                        out.append('\\');</span>
+<span class="fc" id="L60">                        out.append(cp);</span>
+<span class="fc" id="L61">                    }</span>
+                    case 2 -&gt; {
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">                        if (options.escapeSlash()) {</span>
+<span class="fc" id="L64">                            out.append(&quot;\\/&quot;);</span>
+                        }
+                        else {
+<span class="nc" id="L67">                            out.append(&quot;/&quot;);</span>
+                        }
+<span class="nc" id="L69">                    }</span>
+                    case 3 -&gt;
+<span class="fc" id="L71">                            out.append(&quot;\\b&quot;);</span>
+
+                    case 4 -&gt;
+<span class="fc" id="L74">                            out.append(&quot;\\f&quot;);</span>
+
+                    case 5 -&gt;
+<span class="fc" id="L77">                            out.append(&quot;\\n&quot;);</span>
+
+                    case 6 -&gt;
+<span class="fc" id="L80">                            out.append(&quot;\\r&quot;);</span>
+
+                    case 7 -&gt;
+<span class="fc" id="L83">                            out.append(&quot;\\t&quot;);</span>
+
+                    case 8 -&gt;
+<span class="pc" id="L86">                            emitHexString(out, cp);</span>
+                }
+            }
+            else {
+<span class="nc bnc" id="L90" title="All 4 branches missed.">                if (cp == '\u2028' || cp == '\u2029') {</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">                    if (options.escapeJavascriptSeparators()) {</span>
+<span class="nc" id="L92">                        emitHexString(out, cp);</span>
+                    }
+                    else {
+<span class="nc" id="L95">                        out.append(cp);</span>
+                    }
+                }
+                else {
+<span class="nc bnc" id="L99" title="All 2 branches missed.">                    if (options.escapeUnicode()) {</span>
+<span class="nc" id="L100">                        emitHexString(out, cp);</span>
+                    }
+                    else {
+<span class="nc" id="L103">                        out.append(cp);</span>
+                    }
+                }
+            }
+        }
+<span class="fc" id="L108">        out.append('&quot;');</span>
+<span class="fc" id="L109">    }</span>
+
+    static void writeIndent(Appendable out, OptionsWithIndentDepth options) throws IOException {
+<span class="nc" id="L112">        out.append('\n');</span>
+<span class="nc" id="L113">        out.append(&quot; &quot;.repeat(options.indentation() * options.indentDepth));</span>
+<span class="nc" id="L114">    }</span>
+
+    static void writeObject(JsonObject m, Appendable out, OptionsWithIndentDepth options) throws IOException {
+<span class="fc" id="L117">        var indent = options.indent();</span>
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">        var opts = indent</span>
+<span class="nc" id="L119">                ? options.incrementIndentDepth()</span>
+<span class="fc" id="L120">                : options;</span>
+
+<span class="fc" id="L122">        out.append('{');</span>
+<span class="pc bpc" id="L123" title="3 of 4 branches missed.">        if (indent &amp;&amp; !m.isEmpty()) {</span>
+<span class="nc" id="L124">            writeIndent(out, opts);</span>
+        }
+
+<span class="fc" id="L127">        var x = m.entrySet().iterator();</span>
+<span class="fc" id="L128">        var havePrintedKV = false;</span>
+<span class="fc bfc" id="L129" title="All 2 branches covered.">        while (x.hasNext()) {</span>
+<span class="fc" id="L130">            var entry = x.next();</span>
+<span class="fc" id="L131">            var k = entry.getKey();</span>
+<span class="fc" id="L132">            var v = entry.getValue();</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">            if (havePrintedKV) {</span>
+<span class="fc" id="L134">                out.append(',');</span>
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">                if (indent) {</span>
+<span class="nc" id="L136">                    writeIndent(out, opts);</span>
+                }
+            }
+<span class="fc" id="L139">            writeString(k, out, opts);</span>
+<span class="fc" id="L140">            out.append(':');</span>
+<span class="pc bpc" id="L141" title="1 of 2 branches missed.">            if (indent) {</span>
+<span class="nc" id="L142">                out.append(' ');</span>
+            }
+<span class="fc" id="L144">            write(v, out, opts);</span>
+<span class="fc bfc" id="L145" title="All 2 branches covered.">            if (x.hasNext()) {</span>
+<span class="fc" id="L146">                havePrintedKV = true;</span>
+            }
+<span class="fc" id="L148">        }</span>
+<span class="pc bpc" id="L149" title="3 of 4 branches missed.">        if (indent &amp;&amp; !m.isEmpty()) {</span>
+<span class="nc" id="L150">            writeIndent(out, options);</span>
+        }
+<span class="fc" id="L152">        out.append('}');</span>
+<span class="fc" id="L153">    }</span>
+
+    static void writeArray(JsonArray a, Appendable out, OptionsWithIndentDepth options) throws IOException {
+<span class="fc" id="L156">        var indent = options.indent();</span>
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">        var opts = indent</span>
+<span class="nc" id="L158">                ? options.incrementIndentDepth()</span>
+<span class="fc" id="L159">                : options;</span>
+
+<span class="fc" id="L161">        out.append('[');</span>
+<span class="pc bpc" id="L162" title="3 of 4 branches missed.">        if (indent &amp;&amp; !a.isEmpty()) {</span>
+<span class="nc" id="L163">            writeIndent(out, opts);</span>
+        }
+<span class="fc" id="L165">        var x = a.iterator();</span>
+<span class="fc bfc" id="L166" title="All 2 branches covered.">        while (x.hasNext()) {</span>
+<span class="fc" id="L167">            var first = x.next();</span>
+<span class="fc" id="L168">            write(first, out, opts);</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">            if (x.hasNext()) {</span>
+<span class="fc" id="L170">                out.append(',');</span>
+<span class="pc bpc" id="L171" title="1 of 2 branches missed.">                if (indent) {</span>
+<span class="nc" id="L172">                    writeIndent(out, opts);</span>
+                }
+            }
+<span class="fc" id="L175">        }</span>
+
+<span class="pc bpc" id="L177" title="3 of 4 branches missed.">        if (indent &amp;&amp; !a.isEmpty()) {</span>
+<span class="nc" id="L178">            writeIndent(out, options);</span>
+        }
+
+<span class="fc" id="L181">        out.append(']');</span>
+<span class="fc" id="L182">    }</span>
+
+
+    static void write(Json v, Appendable out, OptionsWithIndentDepth options) throws IOException {
+<span class="fc bfc" id="L186" title="All 7 branches covered.">        switch (v) {</span>
+<span class="fc" id="L187">            case JsonNull __ -&gt; out.append(&quot;null&quot;);</span>
+<span class="fc" id="L188">            case JsonTrue __ -&gt; out.append(&quot;true&quot;);</span>
+<span class="fc" id="L189">            case JsonFalse __ -&gt; out.append(&quot;false&quot;);</span>
+<span class="fc" id="L190">            case JsonNumber number -&gt; out.append(number.toString());</span>
+<span class="fc" id="L191">            case JsonString string -&gt; writeString(string, out, options);</span>
+<span class="fc" id="L192">            case JsonArray array -&gt; writeArray(array, out, options);</span>
+<span class="fc" id="L193">            case JsonObject object -&gt; writeObject(object, out, options);</span>
+        }
+<span class="fc" id="L195">    }</span>
+
+<span class="fc" id="L197">    public record OptionsWithIndentDepth(</span>
+            JsonWriteOptions options,
+            int indentDepth
+    ) {
+        OptionsWithIndentDepth(JsonWriteOptions options) {
+<span class="fc" id="L202">            this(options, 0);</span>
+<span class="fc" id="L203">        }</span>
+
+        boolean escapeUnicode() {
+<span class="nc" id="L206">            return options.escapeUnicode();</span>
+        }
+
+        boolean escapeJavascriptSeparators() {
+<span class="nc" id="L210">            return options.escapeJavascriptSeparators();</span>
+        }
+
+        boolean escapeSlash() {
+<span class="fc" id="L214">            return options.escapeSlash();</span>
+        }
+
+        int indentation() {
+<span class="fc" id="L218">            return options.indentation();</span>
+        }
+
+        boolean indent() {
+<span class="pc bpc" id="L222" title="1 of 2 branches missed.">            return indentation() != 0;</span>
+        }
+
+        OptionsWithIndentDepth incrementIndentDepth() {
+<span class="nc" id="L226">            return new OptionsWithIndentDepth(options, indentDepth + 1);</span>
+        }
+    }
+
+    public void write(Json json, Appendable out, JsonWriteOptions options) throws IOException {
+<span class="fc" id="L231">        write(json, out, new OptionsWithIndentDepth(options));</span>
+<span class="fc" id="L232">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonDecoder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">json</a> &gt; <a href="index.source.html" class="el_package">dev.mccue.json</a> &gt; <span class="el_source">JsonDecoder.java</span></div><h1>JsonDecoder.java</h1><pre class="source lang-java linenums">package dev.mccue.json;
+
+import org.jspecify.annotations.Nullable;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.*;
+import java.util.function.Function;
+
+/**
+ * An object that knows how to convert another kind of object can be converted to JSON.
+ *
+ * &lt;p&gt;
+ *     It is preferred that when a decoder fails it throw a {@link JsonDecodeException}.
+ * &lt;/p&gt;
+ *
+ * @param &lt;T&gt; The type that being constructed from the Json.
+ *
+ * @author &lt;a href=&quot;ethan@mccue.dev&quot;&gt;Ethan McCue&lt;/a&gt;
+ */
+@FunctionalInterface
+public interface JsonDecoder&lt;T extends @Nullable Object&gt; {
+    /**
+     * Interpret some {@link Json} as some type.
+     * @param json The json being decoded.
+     * @return An instance of the type decoded from the Json.
+     * @throws JsonDecodeException If the structure of Json does match the needed structure to make a T.
+     *                              Other kinds of exceptions may be thrown, but good citizens should try to
+     *                              use {@link JsonDecodeException}.
+     */
+    T decode(Json json) throws JsonDecodeException;
+
+    /**
+     * Given a decoder which constructs some type of output,
+     * transforms the result of that decoder.
+     *
+     * @param f The function to use to transform the output of the decoder.
+     * @return A new decoder with its output being the result of applying the given function.
+     * @param &lt;R&gt; The new result type to expect from a run of the decoder.
+     */
+    default &lt;R extends @Nullable Object&gt; JsonDecoder&lt;R&gt; map(Function&lt;? super T, ? extends R&gt; f) {
+<span class="nc" id="L42">        return value -&gt; f.apply(this.decode(value));</span>
+    }
+
+    static &lt;T extends @Nullable Object&gt; JsonDecoder&lt;T&gt; of(JsonDecoder&lt;? extends T&gt; decoder) {
+<span class="nc" id="L46">        return decoder::decode;</span>
+    }
+
+    static java.lang.String string(Json json) throws JsonDecodeException {
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        if (!(json instanceof JsonString jsonString)) {</span>
+<span class="nc" id="L51">            throw JsonDecodeException.of(</span>
+                    &quot;expected a string&quot;,
+                    json
+            );
+        } else {
+<span class="fc" id="L56">            return jsonString.toString();</span>
+        }
+    }
+
+    static boolean boolean_(Json json) throws JsonDecodeException {
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        if (!(json instanceof JsonBoolean jsonBoolean)) {</span>
+<span class="nc" id="L62">            throw JsonDecodeException.of(</span>
+                    &quot;expected a boolean&quot;,
+                    json
+            );
+        } else {
+<span class="nc" id="L67">            return jsonBoolean.value();</span>
+        }
+    }
+
+    static int int_(Json json) throws JsonDecodeException {
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        if (!(json instanceof JsonNumber jsonNumber)) {</span>
+<span class="nc" id="L73">            throw JsonDecodeException.of(</span>
+                    &quot;expected a number&quot;,
+                    json
+            );
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        } else if (!jsonNumber.isIntegral()) {</span>
+<span class="nc" id="L78">            throw JsonDecodeException.of(</span>
+                    &quot;expected a number with no decimal part&quot;,
+                    json
+            );
+        } else {
+            try {
+<span class="fc" id="L84">                return jsonNumber.intValueExact();</span>
+<span class="nc" id="L85">            } catch (ArithmeticException e) {</span>
+<span class="nc" id="L86">                throw JsonDecodeException.of(</span>
+                        &quot;expected a number which could be converted to an int&quot;,
+                        json
+                );
+            }
+        }
+    }
+
+    static long long_(Json json) throws JsonDecodeException {
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (!(json instanceof JsonNumber jsonNumber)) {</span>
+<span class="nc" id="L96">            throw JsonDecodeException.of(</span>
+                    &quot;expected a number&quot;,
+                    json
+            );
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">        } else if (!jsonNumber.isIntegral()) {</span>
+<span class="nc" id="L101">            throw JsonDecodeException.of(</span>
+                    &quot;expected a number with no decimal part&quot;,
+                    json
+            );
+        } else {
+            try {
+<span class="fc" id="L107">                return jsonNumber.longValueExact();</span>
+<span class="nc" id="L108">            } catch (ArithmeticException e) {</span>
+<span class="nc" id="L109">                throw JsonDecodeException.of(</span>
+                        &quot;expected a number which could be converted to a long&quot;,
+                        json
+                );
+            }
+        }
+    }
+
+    static float float_(Json json) throws JsonDecodeException {
+<span class="nc bnc" id="L118" title="All 2 branches missed.">        if (!(json instanceof JsonNumber jsonNumber)) {</span>
+<span class="nc" id="L119">            throw JsonDecodeException.of(</span>
+                    &quot;expected a number&quot;,
+                    json
+            );
+        } else {
+<span class="nc" id="L124">            return jsonNumber.floatValue();</span>
+        }
+    }
+
+    static double double_(Json json) throws JsonDecodeException {
+<span class="nc bnc" id="L129" title="All 2 branches missed.">        if (!(json instanceof JsonNumber jsonNumber)) {</span>
+<span class="nc" id="L130">            throw JsonDecodeException.of(</span>
+                    &quot;expected a number&quot;,
+                    json
+            );
+        } else {
+<span class="nc" id="L135">            return jsonNumber.doubleValue();</span>
+        }
+    }
+
+    static BigInteger bigInteger(Json json) throws JsonDecodeException {
+<span class="nc bnc" id="L140" title="All 2 branches missed.">        if (!(json instanceof JsonNumber jsonNumber)) {</span>
+<span class="nc" id="L141">            throw JsonDecodeException.of(</span>
+                    &quot;expected a number&quot;,
+                    json
+            );
+        } else {
+            try {
+<span class="nc" id="L147">                return jsonNumber.bigIntegerValueExact();</span>
+<span class="nc" id="L148">            } catch (ArithmeticException e) {</span>
+<span class="nc" id="L149">                throw JsonDecodeException.of(</span>
+                        &quot;expected a number which could be converted to a bigInteger&quot;,
+                        json
+                );
+            }
+        }
+    }
+
+    static BigDecimal bigDecimal(Json json) throws JsonDecodeException {
+<span class="nc bnc" id="L158" title="All 2 branches missed.">        if (!(json instanceof JsonNumber jsonNumber)) {</span>
+<span class="nc" id="L159">            throw JsonDecodeException.of(</span>
+                    &quot;expected a number&quot;,
+                    json
+            );
+        } else {
+<span class="nc" id="L164">            return jsonNumber.bigDecimalValue();</span>
+        }
+    }
+
+    static &lt;@Nullable T&gt; T null_(Json json) throws JsonDecodeException {
+<span class="pc bpc" id="L169" title="1 of 2 branches missed.">        if (!(json instanceof JsonNull)) {</span>
+<span class="nc" id="L170">            throw JsonDecodeException.of(</span>
+                    &quot;expected null&quot;,
+                    json
+            );
+        } else {
+<span class="fc" id="L175">            return null;</span>
+        }
+    }
+
+    static &lt;T extends @Nullable Object&gt; T null_(Json json, T value) throws JsonDecodeException {
+<span class="nc bnc" id="L180" title="All 2 branches missed.">        if (!(json instanceof JsonNull)) {</span>
+<span class="nc" id="L181">            throw JsonDecodeException.of(</span>
+                    &quot;expected null&quot;,
+                    json
+            );
+        } else {
+<span class="nc" id="L186">            return value;</span>
+        }
+    }
+
+    static &lt;T extends @Nullable Object&gt; JsonDecoder&lt;List&lt;T&gt;&gt; array(
+            JsonDecoder&lt;? extends T&gt; itemDecoder
+    ) throws JsonDecodeException {
+<span class="fc" id="L193">        return json -&gt; array(json, itemDecoder);</span>
+    }
+
+    static JsonArray array(Json json) throws JsonDecodeException {
+<span class="pc bpc" id="L197" title="1 of 2 branches missed.">        if (!(json instanceof JsonArray jsonArray)) {</span>
+<span class="nc" id="L198">            throw JsonDecodeException.of(</span>
+                    &quot;expected an array&quot;,
+                    json
+            );
+        } else {
+<span class="fc" id="L203">            return jsonArray;</span>
+        }
+    }
+
+    static &lt;T extends @Nullable Object&gt; List&lt;T&gt; array(Json json, JsonDecoder&lt;? extends T&gt; itemDecoder) throws JsonDecodeException {
+<span class="pc bpc" id="L208" title="1 of 2 branches missed.">        if (!(json instanceof JsonArray jsonArray)) {</span>
+<span class="nc" id="L209">            throw JsonDecodeException.of(</span>
+                    &quot;expected an array&quot;,
+                    json
+            );
+        } else {
+<span class="fc" id="L214">            var items = new ArrayList&lt;T&gt;(jsonArray.size());</span>
+<span class="fc bfc" id="L215" title="All 2 branches covered.">            for (int i = 0; i &lt; jsonArray.size(); i++) {</span>
+<span class="fc" id="L216">                var jsonItem = jsonArray.get(i);</span>
+                try {
+<span class="fc" id="L218">                    items.add(itemDecoder.decode(jsonItem));</span>
+<span class="nc" id="L219">                } catch (JsonDecodeException e) {</span>
+<span class="nc" id="L220">                    throw JsonDecodeException.atIndex(i, e);</span>
+<span class="nc" id="L221">                } catch (Exception e) {</span>
+<span class="nc" id="L222">                    throw JsonDecodeException.atIndex(i, JsonDecodeException.of(e, jsonItem));</span>
+<span class="fc" id="L223">                }</span>
+            }
+<span class="fc" id="L225">            return Collections.unmodifiableList(items);</span>
+        }
+    }
+
+    static JsonObject object(Json json) throws JsonDecodeException {
+<span class="pc bpc" id="L230" title="1 of 2 branches missed.">        if (!(json instanceof JsonObject jsonObject)) {</span>
+<span class="nc" id="L231">            throw JsonDecodeException.of(</span>
+                    &quot;expected an object&quot;,
+                    json
+            );
+        } else {
+<span class="fc" id="L236">            return jsonObject;</span>
+        }
+    }
+
+    static &lt;T extends @Nullable Object&gt; JsonDecoder&lt;Map&lt;String, T&gt;&gt; object(JsonDecoder&lt;? extends T&gt; valueDecoder) throws JsonDecodeException {
+<span class="nc" id="L241">        return json -&gt; object(json, valueDecoder);</span>
+    }
+
+    static &lt;T extends @Nullable Object&gt; Map&lt;java.lang.String, T&gt; object(
+            Json json,
+            JsonDecoder&lt;? extends T&gt; valueDecoder
+    ) throws JsonDecodeException {
+<span class="nc" id="L248">        var jsonObject = object(json);</span>
+<span class="nc" id="L249">        var m = new LinkedHashMap&lt;String, T&gt;(jsonObject.size());</span>
+<span class="nc" id="L250">        jsonObject.forEach((key, value) -&gt; {</span>
+            try {
+<span class="nc" id="L252">                m.put(key, valueDecoder.decode(value));</span>
+<span class="nc" id="L253">            } catch (JsonDecodeException e) {</span>
+<span class="nc" id="L254">                throw JsonDecodeException.atField(key, e);</span>
+<span class="nc" id="L255">            } catch (Exception e) {</span>
+<span class="nc" id="L256">                throw JsonDecodeException.atField(key, JsonDecodeException.of(e, value));</span>
+<span class="nc" id="L257">            }</span>
+<span class="nc" id="L258">        });</span>
+<span class="nc" id="L259">        return Collections.unmodifiableMap(m);</span>
+    }
+
+    static &lt;T extends @Nullable Object&gt; JsonDecoder&lt;T&gt; field(
+            java.lang.String fieldName,
+            JsonDecoder&lt;? extends T&gt; valueDecoder
+    ) throws JsonDecodeException {
+<span class="fc" id="L266">        return json -&gt; field(json, fieldName, valueDecoder);</span>
+    }
+
+    static &lt;T extends @Nullable Object&gt; T field(
+            Json json,
+            String fieldName,
+            JsonDecoder&lt;? extends T&gt; valueDecoder
+    ) throws JsonDecodeException {
+<span class="fc" id="L274">        var jsonObject = object(json);</span>
+<span class="fc" id="L275">        var value = jsonObject.get(fieldName);</span>
+<span class="pc bpc" id="L276" title="1 of 2 branches missed.">        if (value == null) {</span>
+<span class="nc" id="L277">            throw JsonDecodeException.atField(</span>
+                    fieldName,
+<span class="nc" id="L279">                    JsonDecodeException.of(</span>
+                            &quot;no value for field&quot;,
+                            json
+                    )
+            );
+        }
+        else {
+            try {
+<span class="fc" id="L287">                return valueDecoder.decode(value);</span>
+<span class="nc" id="L288">            } catch (JsonDecodeException e) {</span>
+<span class="nc" id="L289">                throw JsonDecodeException.atField(</span>
+                        fieldName,
+                        e
+                );
+<span class="nc" id="L293">            }  catch (Exception e) {</span>
+<span class="nc" id="L294">                throw JsonDecodeException.atField(fieldName, JsonDecodeException.of(e, value));</span>
+            }
+        }
+    }
+
+    static &lt;T extends @Nullable Object&gt; JsonDecoder&lt;T&gt; nullableField(java.lang.String fieldName, JsonDecoder&lt;? extends T&gt; valueDecoder, T defaultValue) throws JsonDecodeException {
+<span class="nc" id="L300">        return json -&gt; nullableField(json, fieldName, valueDecoder, defaultValue);</span>
+    }
+
+    static &lt;T extends @Nullable Object&gt; T nullableField(Json json, java.lang.String fieldName, JsonDecoder&lt;? extends T&gt; valueDecoder, T defaultValue) throws JsonDecodeException {
+<span class="nc" id="L304">        var decoder = nullable(valueDecoder)</span>
+<span class="nc" id="L305">                .map(o -&gt; o.map(i -&gt; (T) i))</span>
+<span class="nc" id="L306">                .map(o -&gt; o.orElse(defaultValue));</span>
+<span class="nc" id="L307">        return field(json, fieldName, decoder);</span>
+    }
+
+    static &lt;T extends @Nullable Object&gt; JsonDecoder&lt;Optional&lt;T&gt;&gt; nullableField(java.lang.String fieldName, JsonDecoder&lt;? extends T&gt; valueDecoder) throws JsonDecodeException {
+<span class="nc" id="L311">        return json -&gt; nullableField(json, fieldName, valueDecoder);</span>
+    }
+
+    static &lt;T extends @Nullable Object&gt; Optional&lt;T&gt; nullableField(Json json, java.lang.String fieldName, JsonDecoder&lt;? extends T&gt; valueDecoder) throws JsonDecodeException {
+<span class="nc" id="L315">        return nullableField(json, fieldName, valueDecoder.map(Optional::of), Optional.empty());</span>
+    }
+
+    static &lt;T extends @Nullable Object&gt; JsonDecoder&lt;T&gt; optionalField(java.lang.String fieldName, JsonDecoder&lt;? extends T&gt; valueDecoder, T defaultValue) throws JsonDecodeException {
+<span class="nc" id="L319">        return json -&gt; optionalField(json, fieldName, valueDecoder, defaultValue);</span>
+    }
+
+    static &lt;T extends @Nullable Object&gt; T optionalField(Json json, java.lang.String fieldName, JsonDecoder&lt;? extends T&gt; valueDecoder, T defaultValue) throws JsonDecodeException {
+<span class="fc" id="L323">        var jsonObject = object(json);</span>
+<span class="fc" id="L324">        var value = jsonObject.get(fieldName);</span>
+<span class="fc bfc" id="L325" title="All 2 branches covered.">        if (value == null) {</span>
+<span class="fc" id="L326">            return defaultValue;</span>
+        }
+        else {
+            try {
+<span class="fc" id="L330">                return valueDecoder.decode(value);</span>
+<span class="nc" id="L331">            } catch (JsonDecodeException e) {</span>
+<span class="nc" id="L332">                throw JsonDecodeException.atField(</span>
+                        fieldName,
+                        e
+                );
+<span class="nc" id="L336">            } catch (Exception e) {</span>
+<span class="nc" id="L337">                throw JsonDecodeException.atField(fieldName, JsonDecodeException.of(e, value));</span>
+            }
+        }
+    }
+
+    static &lt;T extends @Nullable Object&gt; JsonDecoder&lt;Optional&lt;T&gt;&gt; optionalField(java.lang.String fieldName, JsonDecoder&lt;? extends T&gt; valueDecoder) throws JsonDecodeException {
+<span class="nc" id="L343">        return json -&gt; optionalField(json, fieldName, valueDecoder);</span>
+    }
+
+    static &lt;T extends @Nullable Object&gt; Optional&lt;T&gt; optionalField(Json json, java.lang.String fieldName, JsonDecoder&lt;? extends T&gt; valueDecoder) throws JsonDecodeException {
+<span class="nc" id="L347">        return optionalField(json, fieldName, valueDecoder.map(Optional::of), Optional.empty());</span>
+    }
+
+    static &lt;T extends @Nullable Object&gt; JsonDecoder&lt;Optional&lt;T&gt;&gt; optionalNullableField(java.lang.String fieldName, JsonDecoder&lt;? extends T&gt; valueDecoder) throws JsonDecodeException {
+<span class="nc" id="L351">        return json -&gt; optionalNullableField(json, fieldName, valueDecoder);</span>
+    }
+
+    static &lt;T extends @Nullable Object&gt; Optional&lt;T&gt; optionalNullableField(Json json, java.lang.String fieldName, JsonDecoder&lt;? extends T&gt; valueDecoder) throws JsonDecodeException {
+<span class="nc" id="L355">        return optionalField(json, fieldName, nullable(valueDecoder), Optional.empty());</span>
+    }
+
+    static &lt;T extends @Nullable Object&gt; JsonDecoder&lt;T&gt; optionalNullableField(java.lang.String fieldName, JsonDecoder&lt;? extends T&gt; valueDecoder, T defaultValue) throws JsonDecodeException {
+<span class="nc" id="L359">        return json -&gt; optionalNullableField(json, fieldName, valueDecoder, defaultValue);</span>
+    }
+
+    static &lt;T extends @Nullable Object&gt; T optionalNullableField(Json json, java.lang.String fieldName, JsonDecoder&lt;? extends T&gt; valueDecoder, T defaultValue) throws JsonDecodeException {
+<span class="nc" id="L363">        var decoder = nullable(valueDecoder)</span>
+<span class="nc" id="L364">                .map(opt -&gt; opt.orElse(null))</span>
+<span class="nc bnc" id="L365" title="All 2 branches missed.">                .map(value -&gt; value == null ? defaultValue : value);</span>
+
+<span class="nc" id="L367">        return optionalField(</span>
+                json,
+                fieldName,
+                decoder,
+                defaultValue
+        );
+    }
+
+    static &lt;T extends @Nullable Object&gt; JsonDecoder&lt;T&gt; optionalNullableField(
+            java.lang.String fieldName,
+            JsonDecoder&lt;? extends T&gt; valueDecoder,
+            T whenFieldMissing,
+            T whenFieldNull
+    ) throws JsonDecodeException {
+<span class="nc" id="L381">        return json -&gt; optionalNullableField(</span>
+                json,
+                fieldName,
+                valueDecoder,
+                whenFieldMissing,
+                whenFieldNull
+        );
+    }
+
+    static &lt;T extends @Nullable Object&gt; T optionalNullableField(
+            Json json,
+            String fieldName,
+            JsonDecoder&lt;? extends T&gt; valueDecoder,
+            T whenFieldMissing,
+            T whenFieldNull
+    ) throws JsonDecodeException {
+<span class="nc" id="L397">        var decoder = nullable(valueDecoder)</span>
+<span class="nc" id="L398">                .map(opt -&gt; opt.orElse(null))</span>
+<span class="nc bnc" id="L399" title="All 2 branches missed.">                .map(value -&gt; value == null ? whenFieldNull : value);</span>
+
+<span class="nc" id="L401">        return optionalField(</span>
+                json,
+                fieldName,
+                decoder,
+                whenFieldMissing
+        );
+    }
+
+    static &lt;T extends @Nullable Object&gt; JsonDecoder&lt;T&gt; index(int index, JsonDecoder&lt;? extends T&gt; valueDecoder) throws JsonDecodeException {
+<span class="fc" id="L410">        return json -&gt; index(json, index, valueDecoder);</span>
+    }
+
+    static &lt;T extends @Nullable Object&gt; T index(Json json, int index, JsonDecoder&lt;? extends T&gt; valueDecoder) throws JsonDecodeException {
+<span class="fc" id="L414">        var jsonArray = array(json);</span>
+<span class="pc bpc" id="L415" title="1 of 2 branches missed.">        if (index &gt;= jsonArray.size()) {</span>
+<span class="nc" id="L416">            throw JsonDecodeException.atIndex(</span>
+                    index,
+<span class="nc" id="L418">                    JsonDecodeException.of(</span>
+                            &quot;expected array index to be in bounds&quot;,
+                            json
+                    )
+            );
+        }
+        else {
+            try {
+<span class="fc" id="L426">                return valueDecoder.decode(jsonArray.get(index));</span>
+<span class="nc" id="L427">            } catch (JsonDecodeException e) {</span>
+<span class="nc" id="L428">                throw JsonDecodeException.atIndex(</span>
+                        index,
+                        e
+                );
+<span class="nc" id="L432">            } catch (Exception e) {</span>
+<span class="nc" id="L433">                throw JsonDecodeException.atIndex(index, JsonDecodeException.of(e, jsonArray.get(index)));</span>
+            }
+        }
+    }
+
+    static &lt;T&gt; JsonDecoder&lt;Optional&lt;T&gt;&gt; nullable(JsonDecoder&lt;? extends T&gt; decoder) {
+<span class="nc" id="L439">        return json -&gt; JsonDecoder.oneOf(</span>
+                json,
+<span class="nc" id="L441">                decoder.map(Optional::of),</span>
+<span class="nc" id="L442">                JsonDecoder.of(JsonDecoder::null_).map(__ -&gt; Optional.empty())</span>
+        );
+    }
+
+    static &lt;T extends @Nullable Object&gt; JsonDecoder&lt;T&gt; nullable(JsonDecoder&lt;? extends T&gt; decoder, T defaultValue) {
+<span class="nc" id="L447">        return json -&gt; JsonDecoder.oneOf(</span>
+                json,
+                decoder,
+<span class="nc" id="L450">                JsonDecoder.of(JsonDecoder::null_).map(__ -&gt; defaultValue)</span>
+        );
+    }
+
+    static &lt;T&gt; JsonDecoder&lt;T&gt; oneOf(JsonDecoder&lt;? extends T&gt; decoderA, JsonDecoder&lt;? extends T&gt; decoderB) throws JsonDecodeException {
+<span class="nc" id="L455">        return json -&gt; oneOf(json, decoderA, decoderB);</span>
+    }
+
+    static &lt;T&gt; T oneOf(Json json, JsonDecoder&lt;? extends T&gt; decoderA, JsonDecoder&lt;? extends T&gt; decoderB) throws JsonDecodeException {
+        try {
+<span class="nc" id="L460">            return decoderA.decode(json);</span>
+<span class="nc" id="L461">        } catch (JsonDecodeException e1) {</span>
+            try {
+<span class="nc" id="L463">                return decoderB.decode(json);</span>
+            }
+<span class="nc" id="L465">            catch (JsonDecodeException e2) {</span>
+<span class="nc" id="L466">                var errors = new ArrayList&lt;JsonDecodeException&gt;();</span>
+<span class="nc bnc" id="L467" title="All 2 branches missed.">                if (e1 instanceof JsonDecodeException.OneOf oneOf) {</span>
+<span class="nc" id="L468">                    errors.addAll(oneOf.errors());</span>
+                }
+                else {
+<span class="nc" id="L471">                    errors.add(e1);</span>
+                }
+
+<span class="nc bnc" id="L474" title="All 2 branches missed.">                if (e2 instanceof JsonDecodeException.OneOf oneOf) {</span>
+<span class="nc" id="L475">                    errors.addAll(oneOf.errors());</span>
+                }
+                else {
+<span class="nc" id="L478">                    errors.add(e2);</span>
+                }
+
+<span class="nc" id="L481">                throw JsonDecodeException.oneOf(Collections.unmodifiableList(errors));</span>
+            }
+<span class="nc" id="L483">            catch (Exception e2) {</span>
+<span class="nc" id="L484">                var errors = new ArrayList&lt;JsonDecodeException&gt;();</span>
+<span class="nc bnc" id="L485" title="All 2 branches missed.">                if (e1 instanceof JsonDecodeException.OneOf oneOf) {</span>
+<span class="nc" id="L486">                    errors.addAll(oneOf.errors());</span>
+                }
+                else {
+<span class="nc" id="L489">                    errors.add(e1);</span>
+                }
+
+<span class="nc" id="L492">                errors.add(JsonDecodeException.of(e2, json));</span>
+
+<span class="nc" id="L494">                throw JsonDecodeException.oneOf(Collections.unmodifiableList(errors));</span>
+            }
+        }
+    }
+
+
+    @SafeVarargs
+    @SuppressWarnings(&quot;varargs&quot;)
+    static &lt;T&gt; JsonDecoder&lt;T&gt; oneOf(JsonDecoder&lt;? extends T&gt; decoderA, JsonDecoder&lt;? extends T&gt;... decoders) throws JsonDecodeException {
+<span class="nc" id="L503">        return json -&gt; oneOf(json, decoderA, decoders);</span>
+    }
+
+    @SafeVarargs
+    static &lt;T&gt; T oneOf(Json json, JsonDecoder&lt;? extends T&gt; decoderA, JsonDecoder&lt;? extends T&gt;... decoders) throws JsonDecodeException {
+        try {
+<span class="nc" id="L509">            return decoderA.decode(json);</span>
+<span class="nc" id="L510">        } catch (JsonDecodeException e1) {</span>
+<span class="nc" id="L511">            var errors = new ArrayList&lt;JsonDecodeException&gt;();</span>
+<span class="nc bnc" id="L512" title="All 2 branches missed.">            if (e1 instanceof JsonDecodeException.OneOf oneOf) {</span>
+<span class="nc" id="L513">                errors.addAll(oneOf.errors());</span>
+            }
+            else {
+<span class="nc" id="L516">                errors.add(e1);</span>
+            }
+
+<span class="nc bnc" id="L519" title="All 2 branches missed.">            for (var decoder : decoders) {</span>
+                try {
+<span class="nc" id="L521">                    return decoder.decode(json);</span>
+<span class="nc" id="L522">                } catch (JsonDecodeException e2) {</span>
+<span class="nc bnc" id="L523" title="All 2 branches missed.">                    if (e2 instanceof JsonDecodeException.OneOf oneOf) {</span>
+<span class="nc" id="L524">                        errors.addAll(oneOf.errors());</span>
+                    } else {
+<span class="nc" id="L526">                        errors.add(e2);</span>
+                    }
+<span class="nc" id="L528">                } catch (Exception e2) {</span>
+<span class="nc" id="L529">                    errors.add(JsonDecodeException.of(e2, json));</span>
+<span class="nc" id="L530">                }</span>
+            }
+
+<span class="nc" id="L533">            throw JsonDecodeException.oneOf(Collections.unmodifiableList(errors));</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

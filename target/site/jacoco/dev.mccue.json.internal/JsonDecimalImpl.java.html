@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonDecimalImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">json</a> &gt; <a href="index.source.html" class="el_package">dev.mccue.json.internal</a> &gt; <span class="el_source">JsonDecimalImpl.java</span></div><h1>JsonDecimalImpl.java</h1><pre class="source lang-java linenums">package dev.mccue.json.internal;
+
+import dev.mccue.json.Json;
+import dev.mccue.json.JsonDecimal;
+import dev.mccue.json.serialization.JsonSerializationProxy;
+
+import java.io.Serial;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+public final class JsonDecimalImpl extends JsonDecimal {
+    private final String value;
+
+<span class="fc" id="L14">    public JsonDecimalImpl(String value) {</span>
+<span class="fc" id="L15">        this.value = value;</span>
+<span class="fc" id="L16">    }</span>
+
+    @Override
+    public BigDecimal bigDecimalValue() {
+<span class="fc" id="L20">        return new BigDecimal(value);</span>
+    }
+
+    @Override
+    public int intValue() {
+<span class="nc" id="L25">        return bigDecimalValue().intValue();</span>
+    }
+
+    @Override
+    public long longValue() {
+<span class="nc" id="L30">        return bigDecimalValue().longValue();</span>
+    }
+
+    @Override
+    public float floatValue() {
+<span class="nc" id="L35">        return bigDecimalValue().floatValue();</span>
+    }
+
+    @Override
+    public double doubleValue() {
+<span class="nc" id="L40">        return bigDecimalValue().doubleValue();</span>
+    }
+
+    @Override
+    public java.math.BigInteger bigIntegerValue() {
+<span class="nc" id="L45">        return bigDecimalValue().toBigInteger();</span>
+    }
+
+    @Override
+    public int intValueExact() {
+<span class="nc" id="L50">        return bigDecimalValue().intValueExact();</span>
+    }
+
+    @Override
+    public long longValueExact() {
+<span class="nc" id="L55">        return bigDecimalValue().longValueExact();</span>
+    }
+
+    @Override
+    public BigInteger bigIntegerValueExact() {
+<span class="nc" id="L60">        return bigDecimalValue().toBigIntegerExact();</span>
+    }
+
+    @Override
+    public boolean isIntegral() {
+<span class="nc bnc" id="L65" title="All 2 branches missed.">        return bigDecimalValue().scale() == 0;</span>
+    }
+
+    @Override
+    public java.lang.String toString() {
+<span class="nc" id="L70">        return this.value;</span>
+    }
+
+    @Serial
+    private Object writeReplace() {
+<span class="nc" id="L75">        return new JsonSerializationProxy(Json.writeString(this));</span>
+    }
+
+    @Serial
+    private Object readResolve() {
+<span class="nc" id="L80">        throw new IllegalStateException();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

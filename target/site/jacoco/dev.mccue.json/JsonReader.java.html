@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonReader.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">json</a> &gt; <a href="index.source.html" class="el_package">dev.mccue.json</a> &gt; <span class="el_source">JsonReader.java</span></div><h1>JsonReader.java</h1><pre class="source lang-java linenums">package dev.mccue.json;
+
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+/**
+ * An iterable view of a stream of Json.
+ *
+ * @author &lt;a href=&quot;ethan@mccue.dev&quot;&gt;Ethan McCue&lt;/a&gt;
+ */
+public interface JsonReader extends Iterable&lt;Json&gt; {
+    Json read();
+
+    default Stream&lt;Json&gt; stream() {
+<span class="fc" id="L18">        var spliterator = Spliterators.spliteratorUnknownSize(</span>
+<span class="fc" id="L19">                this.iterator(),</span>
+                Spliterator.NONNULL &amp; Spliterator.ORDERED
+        );
+
+<span class="fc" id="L23">        return StreamSupport.stream( spliterator, false);</span>
+    }
+
+    @Override
+    default Iterator&lt;Json&gt; iterator() {
+<span class="fc" id="L28">        var self = this;</span>
+<span class="fc" id="L29">        return new Iterator&lt;&gt;() {</span>
+<span class="fc" id="L30">            boolean done = false;</span>
+<span class="fc" id="L31">            Json next = null;</span>
+
+            @Override
+            public boolean hasNext() {
+<span class="pc bpc" id="L35" title="1 of 2 branches missed.">                if (!done) {</span>
+<span class="fc" id="L36">                    next = self.read();</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">                    if (next == null) {</span>
+<span class="fc" id="L38">                        done = true;</span>
+                    }
+                }
+
+<span class="fc bfc" id="L42" title="All 2 branches covered.">                return !done;</span>
+            }
+
+            @Override
+            public Json next() {
+<span class="pc bpc" id="L47" title="2 of 4 branches missed.">                if (!done &amp;&amp; next == null) {</span>
+<span class="nc" id="L48">                    return self.read();</span>
+                }
+                else {
+<span class="fc" id="L51">                    return next;</span>
+                }
+            }
+        };
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ArrayBuilderImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">json</a> &gt; <a href="index.source.html" class="el_package">dev.mccue.json.internal</a> &gt; <span class="el_source">ArrayBuilderImpl.java</span></div><h1>ArrayBuilderImpl.java</h1><pre class="source lang-java linenums">package dev.mccue.json.internal;
+
+import dev.mccue.json.*;
+import org.jspecify.annotations.Nullable;
+
+import java.util.*;
+
+@ValueCandidate
+<span class="fc" id="L9">public record ArrayBuilderImpl(ArrayList&lt;Json&gt; values) implements JsonArray.Builder {</span>
+    public ArrayBuilderImpl() {
+<span class="fc" id="L11">        this(new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L12">    }</span>
+
+    public ArrayBuilderImpl(int initialCapacity) {
+<span class="nc" id="L15">        this(new ArrayList&lt;&gt;(initialCapacity));</span>
+<span class="nc" id="L16">    }</span>
+
+    @Override
+    public JsonArray.Builder add(@Nullable Json value) {
+<span class="pc bpc" id="L20" title="1 of 2 branches missed.">        this.values.add(value == null ? Json.ofNull() : value);</span>
+<span class="fc" id="L21">        return this;</span>
+    }
+
+    @Override
+    public JsonArray.Builder addAll(Collection&lt;? extends @Nullable JsonEncodable&gt; value) {
+<span class="nc" id="L26">        Objects.requireNonNull(value);</span>
+<span class="nc bnc" id="L27" title="All 2 branches missed.">        value.forEach(v -&gt; this.values.add(v == null ? Json.ofNull() : v.toJson()));</span>
+<span class="nc" id="L28">        return this;</span>
+    }
+
+    @Override
+    public JsonArray build() {
+<span class="fc" id="L33">        return new ArrayImpl(List.copyOf(this.values));</span>
+    }
+
+    @InternalInvariant({
+            &quot;no methods called on builder after this one&quot;,
+    })
+    JsonArray buildInternal() {
+<span class="fc" id="L40">        return new ArrayImpl(Collections.unmodifiableList(this.values));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

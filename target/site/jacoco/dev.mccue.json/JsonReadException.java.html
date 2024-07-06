@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonReadException.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">json</a> &gt; <a href="index.source.html" class="el_package">dev.mccue.json</a> &gt; <span class="el_source">JsonReadException.java</span></div><h1>JsonReadException.java</h1><pre class="source lang-java linenums">package dev.mccue.json;
+
+import java.io.Serial;
+
+/**
+ * An exception encountered when reading json.
+ *
+ * @author &lt;a href=&quot;ethan@mccue.dev&quot;&gt;Ethan McCue&lt;/a&gt;
+ */
+public final class JsonReadException extends RuntimeException {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private JsonReadException() {
+        super();
+    }
+    private JsonReadException(String message) {
+<span class="fc" id="L18">        super(message);</span>
+<span class="fc" id="L19">    }</span>
+
+    private JsonReadException(String message, Throwable t) {
+<span class="nc" id="L22">        super(message, t);</span>
+<span class="nc" id="L23">    }</span>
+
+    public static JsonReadException invalidToken() {
+<span class="nc" id="L26">        throw new JsonReadException();</span>
+    }
+
+    public static JsonReadException expectedTrue() {
+<span class="nc" id="L30">        return new JsonReadException(&quot;JSON error (expected true)&quot;);</span>
+    }
+
+    public static JsonReadException expectedFalse() {
+<span class="nc" id="L34">        return new JsonReadException(&quot;JSON error (expected false)&quot;);</span>
+    }
+
+    public static JsonReadException expectedNull() {
+<span class="nc" id="L38">        return new JsonReadException(&quot;JSON error (expected null)&quot;);</span>
+    }
+
+    public static JsonReadException unexpectedCharacter(char c) {
+<span class="nc" id="L42">        return new JsonReadException(&quot;JSON error (unexpected character): &quot; + c);</span>
+    }
+    public static JsonReadException invalidEscapeCharacter(char c) {
+<span class="nc" id="L45">        return new JsonReadException(&quot;JSON error (invalid escaped char): &quot; + c);</span>
+    }
+
+
+    public static JsonReadException unexpectedEOF() {
+<span class="fc" id="L50">        return new JsonReadException(&quot;JSON error (end-of-file)&quot;);</span>
+    }
+
+    public static JsonReadException unexpectedEOFInsideString() {
+<span class="nc" id="L54">        return new JsonReadException(&quot;JSON error (end-of-file inside string)&quot;);</span>
+    }
+
+    public static JsonReadException unexpectedEOFInsideEscapedChar() {
+<span class="nc" id="L58">        return new JsonReadException(&quot;JSON error (end-of-file inside escaped char)&quot;);</span>
+    }
+
+    public static JsonReadException unexpectedEOFInsideUnicodeCharacterEscape() {
+<span class="nc" id="L62">        return new JsonReadException(&quot;JSON error (end-of-file inside Unicode character escape)&quot;);</span>
+    }
+
+    public static JsonReadException invalidUnicodeCharacterEscape(NumberFormatException e) {
+<span class="nc" id="L66">        return new JsonReadException(&quot;Json error (invalid Unicode character escape)&quot;, e);</span>
+    }
+
+    public static JsonReadException invalidArray() {
+<span class="nc" id="L70">        return new JsonReadException(&quot;JSON error (invalid array)&quot;);</span>
+    }
+
+    public static JsonReadException invalidNumberLiteral() {
+<span class="nc" id="L74">        return new JsonReadException(&quot;JSON error (invalid number literal)&quot;);</span>
+    }
+
+    public static JsonReadException missingEntryInObject() {
+<span class="nc" id="L78">        return new JsonReadException(&quot;JSON error (missing entry in object)&quot;);</span>
+    }
+
+    public static JsonReadException emptyEntryInObject() {
+<span class="nc" id="L82">        return new JsonReadException(&quot;JSON error empty entry in object is not allowed&quot;);</span>
+    }
+
+    public static JsonReadException missingColonInObject() {
+<span class="nc" id="L86">        return new JsonReadException(&quot;JSON error (missing `:` in object)&quot;);</span>
+    }
+
+    public static JsonReadException nonStringKeyInObject(char c) {
+<span class="nc" id="L90">        return new JsonReadException(&quot;JSON error (non-string key in object), found `&quot; + c + &quot;`, expected `\&quot;`&quot;);</span>
+    }
+
+    public static JsonReadException nonWhitespaceTrailingContents(char c) {
+<span class="fc" id="L94">        return new JsonReadException(&quot;JSON error (non-whitespace trailing character): `&quot; + c + &quot;`&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

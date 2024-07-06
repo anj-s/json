@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonEncoder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">json</a> &gt; <a href="index.source.html" class="el_package">dev.mccue.json</a> &gt; <span class="el_source">JsonEncoder.java</span></div><h1>JsonEncoder.java</h1><pre class="source lang-java linenums">package dev.mccue.json;
+
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.Function;
+
+/**
+ * Object that knows how to encode an object into Json.
+ *
+ * &lt;p&gt;
+ *     This is a counterpart to {@link JsonEncodable} which can be provided
+ *     to encode objects in contexts where elements are not, for whatever reason,
+ *     have an intrinsic Json representation.
+ * &lt;/p&gt;
+ * @param &lt;T&gt; The type of element to encode.
+ * @author &lt;a href=&quot;ethan@mccue.dev&quot;&gt;Ethan McCue&lt;/a&gt;
+ */
+public interface JsonEncoder&lt;T extends @Nullable Object&gt; {
+    /**
+     * Encodes the given value to Json.
+     * @param value The value to encode.
+     * @return The encoded value.
+     */
+    Json encode(T value);
+
+
+    /**
+     * Creates a {@link JsonEncoder} which delegates to an intrinsic implementation
+     * provided by virtue of being {@link JsonEncodable}.
+     * @return A {@link JsonEncoder}.
+     * @param &lt;T&gt; The type to encode.
+     */
+    static &lt;T extends JsonEncodable&gt; JsonEncoder&lt;T&gt; of() {
+<span class="nc" id="L34">        return JsonEncodable::toJson;</span>
+    }
+
+    /**
+     * Convenience method to target a lambda expression to a {@link JsonEncoder}
+     * and be able to call methods such as {@link JsonEncoder#map(Function)}.
+     * @param encoder The expression to wrap as an encoder.
+     * @return A {@link JsonEncoder}.
+     * @param &lt;T&gt; The type to encode.
+     */
+    static &lt;T extends @Nullable Object&gt; JsonEncoder&lt;T&gt; of(JsonEncoder&lt;? super T&gt; encoder) {
+<span class="nc" id="L45">        return encoder::encode;</span>
+    }
+
+    /**
+     * Maps the result of this encoder.
+     * @param f The function to apply.
+     * @return An encoder that encodes a different type.
+     * @param &lt;R&gt; The type the returned encoder will encode.
+     */
+    default &lt;R extends @Nullable Object&gt; JsonEncoder&lt;R&gt; map(Function&lt;? super R, ? extends T&gt; f) {
+<span class="nc" id="L55">        return r -&gt; this.encode(f.apply(r));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

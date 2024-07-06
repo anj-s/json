@@ -92,7 +92,7 @@
                         <goals>
                             <goal>check</goal>
                         </goals>
-                        <!-- <configuration>
+                        <configuration>
                             <rules>
                                 <rule>
                                     <element>BUNDLE</element>
@@ -105,7 +105,7 @@
                                     </limits>
                                 </rule>
                             </rules>
-                        </configuration> -->
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

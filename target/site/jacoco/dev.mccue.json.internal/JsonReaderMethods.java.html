@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonReaderMethods.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">json</a> &gt; <a href="index.source.html" class="el_package">dev.mccue.json.internal</a> &gt; <span class="el_source">JsonReaderMethods.java</span></div><h1>JsonReaderMethods.java</h1><pre class="source lang-java linenums">package dev.mccue.json.internal;
+
+
+import dev.mccue.json.Json;
+import dev.mccue.json.JsonNumber;
+import dev.mccue.json.JsonReadException;
+import dev.mccue.json.JsonReadOptions;
+import dev.mccue.json.stream.JsonArrayHandler;
+import dev.mccue.json.stream.JsonStreamReadOptions;
+import dev.mccue.json.stream.JsonValueHandler;
+import org.jspecify.annotations.Nullable;
+
+import java.io.IOException;
+import java.io.PushbackReader;
+
+public final class JsonReaderMethods {
+    private JsonReaderMethods() {}
+
+    /**
+     * Expects to be called with the head of the stream AFTER the
+     * initial &quot;\\u&quot;.  Reads the next four characters from the stream.
+     */
+    private static char readHexChar(PushbackReader stream) throws IOException {
+<span class="fc" id="L24">        var a = stream.read();</span>
+<span class="fc" id="L25">        var b = stream.read();</span>
+<span class="fc" id="L26">        var c = stream.read();</span>
+<span class="fc" id="L27">        var d = stream.read();</span>
+
+<span class="pc bpc" id="L29" title="4 of 8 branches missed.">        if (a &lt; 0 || b &lt; 0 || c &lt; 0 || d &lt; 0) {</span>
+<span class="nc" id="L30">            throw JsonReadException.unexpectedEOFInsideUnicodeCharacterEscape();</span>
+        }
+
+<span class="fc" id="L33">        var s = String.valueOf(new char[] { (char) a, (char) b, (char) c, (char) d });;</span>
+
+        try {
+<span class="fc" id="L36">            return (char) Integer.parseInt(s, 16);</span>
+<span class="nc" id="L37">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L38">            throw JsonReadException.invalidUnicodeCharacterEscape(e);</span>
+        }
+
+    }
+
+    private static char readEscapedChar(PushbackReader stream) throws IOException {
+        // Expects to be called with the head of the stream AFTER the
+        // initial backslash.
+<span class="fc" id="L46">        var c = stream.read();</span>
+<span class="pc bpc" id="L47" title="1 of 2 branches missed.">        if (c &lt; 0) {</span>
+<span class="nc" id="L48">            throw JsonReadException.unexpectedEOFInsideEscapedChar();</span>
+        }
+
+<span class="pc bpc" id="L51" title="1 of 8 branches missed.">        return switch ((char) c) {</span>
+<span class="fc" id="L52">            case '&quot;', '\\', '/' -&gt; (char) c;</span>
+<span class="fc" id="L53">            case 'b' -&gt; '\b'; // backspace</span>
+<span class="fc" id="L54">            case 'f' -&gt; '\f'; // formfeed</span>
+<span class="fc" id="L55">            case 'n' -&gt; '\n'; // newline</span>
+<span class="fc" id="L56">            case 'r' -&gt; '\r'; // return</span>
+<span class="fc" id="L57">            case 't' -&gt; '\t'; // tab</span>
+<span class="fc" id="L58">            case 'u' -&gt; readHexChar(stream);</span>
+<span class="nc" id="L59">            default -&gt; throw JsonReadException.invalidEscapeCharacter((char) c);</span>
+        };
+    }
+
+    private static String readQuotedString(PushbackReader stream) throws IOException {
+        // Expects to be called with the head of the stream AFTER the
+        // opening quotation mark.
+<span class="fc" id="L66">        var buffer = new StringBuilder();</span>
+        while (true) {
+<span class="fc" id="L68">            var c = stream.read();</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">            if (c &lt; 0) {</span>
+<span class="nc" id="L70">                throw JsonReadException.unexpectedEOFInsideString();</span>
+            }
+<span class="fc bfc" id="L72" title="All 3 branches covered.">            switch ((char) c) {</span>
+                case '&quot;':
+<span class="fc" id="L74">                    return buffer.toString();</span>
+                case '\\':
+<span class="fc" id="L76">                    buffer.append(readEscapedChar(stream));</span>
+<span class="fc" id="L77">                    break;</span>
+                default:
+<span class="fc" id="L79">                    buffer.append((char) c);</span>
+            }
+<span class="fc" id="L81">        }</span>
+    }
+
+    private static JsonNumber readInteger(String string) {
+<span class="fc" id="L85">        return new JsonIntegerImpl(string);</span>
+    }
+
+    private static JsonNumber readDecimal(String string) {
+<span class="fc" id="L89">        return new JsonDecimalImpl(string);</span>
+    }
+
+    private static JsonNumber readNumber(PushbackReader stream) throws IOException {
+<span class="fc" id="L93">        var buffer = new StringBuilder();</span>
+
+<span class="fc" id="L95">        enum Stage {</span>
+<span class="fc" id="L96">            MINUS,</span>
+<span class="fc" id="L97">            INT_ZERO,</span>
+<span class="fc" id="L98">            INT_DIGIT,</span>
+<span class="fc" id="L99">            FRAC_POINT,</span>
+<span class="fc" id="L100">            FRAC_FIRST,</span>
+<span class="fc" id="L101">            FRAC_DIGIT,</span>
+<span class="fc" id="L102">            EXP_SYMBOL,</span>
+<span class="fc" id="L103">            EXP_FIRST,</span>
+<span class="fc" id="L104">            EXP_DIGIT</span>
+        }
+
+        boolean isDecimal;
+<span class="fc" id="L108">        var stage = Stage.MINUS;</span>
+
+        loop:
+        while (true) {
+<span class="fc" id="L112">            var c = stream.read();</span>
+<span class="pc bpc" id="L113" title="2 of 10 branches missed.">            switch (stage) {</span>
+                case MINUS:
+<span class="pc bpc" id="L115" title="2 of 4 branches missed.">                    switch (c) {</span>
+                        case '-' -&gt; {
+<span class="fc" id="L117">                            buffer.append((char) c);</span>
+<span class="fc" id="L118">                            stage = Stage.INT_ZERO;</span>
+<span class="fc" id="L119">                            continue;</span>
+                        }
+                        case '0' -&gt; {
+<span class="nc" id="L122">                            buffer.append((char) c);</span>
+<span class="nc" id="L123">                            stage = Stage.FRAC_POINT;</span>
+<span class="nc" id="L124">                            continue;</span>
+                        }
+                        case '1', '2', '3', '4', '5', '6', '7', '8', '9' -&gt; {
+<span class="fc" id="L127">                            buffer.append((char) c);</span>
+<span class="fc" id="L128">                            stage = Stage.INT_DIGIT;</span>
+<span class="fc" id="L129">                            continue;</span>
+                        }
+                        default -&gt;
+<span class="nc" id="L132">                                throw JsonReadException.invalidNumberLiteral();</span>
+                    }
+                case INT_ZERO:
+<span class="pc bpc" id="L135" title="1 of 3 branches missed.">                    switch (c) {</span>
+                        case '0' -&gt; {
+<span class="fc" id="L137">                            buffer.append((char) c);</span>
+<span class="fc" id="L138">                            stage = Stage.FRAC_POINT;</span>
+<span class="fc" id="L139">                            continue;</span>
+                        }
+                        case '1', '2', '3', '4', '5', '6', '7', '8', '9' -&gt; {
+<span class="fc" id="L142">                            buffer.append((char) c);</span>
+<span class="fc" id="L143">                            stage = Stage.INT_DIGIT;</span>
+<span class="fc" id="L144">                            continue;</span>
+                        }
+                        default -&gt;
+<span class="nc" id="L147">                                throw JsonReadException.invalidNumberLiteral();</span>
+                    }
+                case INT_DIGIT:
+                    // at this point, there is at least one digit
+<span class="pc bpc" id="L151" title="1 of 6 branches missed.">                    switch (c) {</span>
+                        case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -&gt; {
+<span class="fc" id="L153">                            buffer.append((char) c);</span>
+<span class="fc" id="L154">                            continue;</span>
+                        }
+                        case '.' -&gt; {
+<span class="fc" id="L157">                            buffer.append((char) c);</span>
+<span class="fc" id="L158">                            stage = Stage.FRAC_FIRST;</span>
+<span class="fc" id="L159">                            continue;</span>
+                        }
+                        case 'e', 'E' -&gt; {
+<span class="fc" id="L162">                            buffer.append((char) c);</span>
+<span class="fc" id="L163">                            stage = Stage.EXP_SYMBOL;</span>
+<span class="fc" id="L164">                            continue;</span>
+                        }
+                        case 9, 10, 13, 32, ',', ']', '}' -&gt; {
+<span class="fc" id="L167">                            stream.unread(c);</span>
+<span class="fc" id="L168">                            isDecimal = false;</span>
+<span class="fc" id="L169">                            break loop;</span>
+                        }
+                        case -1 -&gt; {
+<span class="fc" id="L172">                            isDecimal = false;</span>
+<span class="fc" id="L173">                            break loop;</span>
+                        }
+                        default -&gt; {
+<span class="nc" id="L176">                            throw JsonReadException.invalidNumberLiteral();</span>
+                        }
+                    }
+                case FRAC_POINT:
+<span class="pc bpc" id="L180" title="4 of 5 branches missed.">                    switch (c) {</span>
+                        case '.' -&gt; {
+<span class="fc" id="L182">                            buffer.append((char) c);</span>
+<span class="fc" id="L183">                            stage = Stage.FRAC_FIRST;</span>
+<span class="fc" id="L184">                            continue;</span>
+                        }
+                        case 'e', 'E' -&gt; {
+<span class="nc" id="L187">                            buffer.append((char) c);</span>
+<span class="nc" id="L188">                            stage = Stage.EXP_SYMBOL;</span>
+<span class="nc" id="L189">                            continue;</span>
+                        }
+                        case 9, 10, 13, 32, ',', ']', '}' -&gt; {
+<span class="nc" id="L192">                            stream.unread(c);</span>
+<span class="nc" id="L193">                            isDecimal = false;</span>
+<span class="nc" id="L194">                            break loop;</span>
+                        }
+                        case -1 -&gt; {
+<span class="nc" id="L197">                            isDecimal = false;</span>
+<span class="nc" id="L198">                            break loop;</span>
+                        }
+                        default -&gt; {
+                            // Disallow zero-padded numbers or invalid characters
+<span class="nc" id="L202">                            throw JsonReadException.invalidNumberLiteral();</span>
+                        }
+                    }
+                case FRAC_FIRST:
+                    // previous character is a &quot;.&quot;
+<span class="pc bpc" id="L207" title="1 of 2 branches missed.">                    switch (c) {</span>
+                        case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -&gt; {
+<span class="fc" id="L209">                            buffer.append((char) c);</span>
+<span class="fc" id="L210">                            stage = Stage.FRAC_DIGIT;</span>
+<span class="fc" id="L211">                            continue;</span>
+                        }
+                        default -&gt; {
+<span class="nc" id="L214">                            throw JsonReadException.invalidNumberLiteral();</span>
+                        }
+                    }
+                case FRAC_DIGIT:
+                    // any number of following digits
+<span class="pc bpc" id="L219" title="3 of 5 branches missed.">                    switch (c) {</span>
+                        case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -&gt; {
+<span class="fc" id="L221">                            buffer.append((char) c);</span>
+<span class="fc" id="L222">                            continue;</span>
+                        }
+                        case 'e', 'E' -&gt; {
+<span class="nc" id="L225">                            buffer.append((char) c);</span>
+<span class="nc" id="L226">                            stage = Stage.EXP_SYMBOL;</span>
+<span class="nc" id="L227">                            continue;</span>
+                        }
+                        case 9, 10, 13, 32, ',', ']', '}' -&gt; {
+<span class="nc" id="L230">                            stream.unread(c);</span>
+<span class="nc" id="L231">                            isDecimal = true;</span>
+<span class="nc" id="L232">                            break loop;</span>
+                        }
+                        case  -1 -&gt; {
+<span class="fc" id="L235">                            isDecimal = true;</span>
+<span class="fc" id="L236">                            break loop;</span>
+                        }
+                        default -&gt; {
+                            // Disallow zero-padded numbers or invalid characters
+<span class="nc" id="L240">                            throw JsonReadException.invalidNumberLiteral();</span>
+                        }
+                    }
+                case EXP_SYMBOL:
+<span class="pc bpc" id="L244" title="2 of 3 branches missed.">                    switch (c) {</span>
+                        case '-', '+' -&gt; {
+<span class="nc" id="L246">                            buffer.append((char) c);</span>
+<span class="nc" id="L247">                            stage = Stage.EXP_FIRST;</span>
+<span class="nc" id="L248">                            continue;</span>
+                        }
+                        case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -&gt; {
+<span class="fc" id="L251">                            buffer.append((char) c);</span>
+<span class="fc" id="L252">                            stage = Stage.EXP_DIGIT;</span>
+<span class="fc" id="L253">                            continue;</span>
+                        }
+                        default -&gt;
+<span class="nc" id="L256">                                throw JsonReadException.invalidNumberLiteral();</span>
+                    }
+                case EXP_FIRST:
+<span class="nc bnc" id="L259" title="All 2 branches missed.">                    switch (c) {</span>
+                        case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -&gt; {
+<span class="nc" id="L261">                            buffer.append((char) c);</span>
+<span class="nc" id="L262">                            stage = Stage.EXP_DIGIT;</span>
+<span class="nc" id="L263">                            continue;</span>
+                        }
+                        default -&gt;
+<span class="nc" id="L266">                                throw JsonReadException.invalidNumberLiteral();</span>
+                    }
+                case EXP_DIGIT:
+<span class="pc bpc" id="L269" title="3 of 4 branches missed.">                    switch (c) {</span>
+                        case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -&gt; {
+<span class="nc" id="L271">                            buffer.append((char) c);</span>
+<span class="nc" id="L272">                        }</span>
+                        case 9, 10, 13, 32, ',', ']', '}' -&gt; {
+<span class="nc" id="L274">                            stream.unread(c);</span>
+<span class="nc" id="L275">                            isDecimal = true;</span>
+<span class="nc" id="L276">                            break loop;</span>
+                        }
+                        case -1 -&gt; {
+<span class="fc" id="L279">                            isDecimal = true;</span>
+<span class="fc" id="L280">                            break loop;</span>
+                        }
+                        default -&gt; {
+                            // Disallow zero-padded numbers or invalid characters
+<span class="nc" id="L284">                            throw JsonReadException.invalidNumberLiteral();</span>
+                        }
+                    }
+            }
+<span class="nc" id="L288">        }</span>
+
+<span class="fc bfc" id="L290" title="All 2 branches covered.">        if (isDecimal) {</span>
+<span class="fc" id="L291">            return readDecimal(buffer.toString());</span>
+        }
+        else {
+<span class="fc" id="L294">            return readInteger(buffer.toString());</span>
+        }
+    }
+
+    private static int nextToken(PushbackReader stream) throws IOException {
+<span class="fc" id="L299">        int c = stream.read();</span>
+        while (true) {
+<span class="fc bfc" id="L301" title="All 2 branches covered.">            if (32 &lt; c) {</span>
+<span class="fc" id="L302">                return c;</span>
+            }
+            else {
+<span class="pc bpc" id="L305" title="1 of 3 branches missed.">                switch (c) {</span>
+                    case 9, 10, 13, 32 -&gt; {
+<span class="fc" id="L307">                        c = stream.read();</span>
+<span class="fc" id="L308">                    }</span>
+                    case -1 -&gt; {
+<span class="fc" id="L310">                        return -1;</span>
+                    }
+                    default -&gt;
+<span class="nc" id="L313">                            throw JsonReadException.invalidToken();</span>
+                }
+            }
+        }
+    }
+
+    private static @Nullable String readKey(PushbackReader stream) throws IOException {
+<span class="fc" id="L320">        var c = nextToken(stream);</span>
+<span class="fc bfc" id="L321" title="All 2 branches covered.">        if (c == '\&quot;') {</span>
+<span class="fc" id="L322">            var key = readQuotedString(stream);</span>
+<span class="pc bpc" id="L323" title="1 of 2 branches missed.">            if ((int) ':' == nextToken(stream)) {</span>
+<span class="fc" id="L324">                return key;</span>
+            }
+            else {
+<span class="nc" id="L327">                throw JsonReadException.missingColonInObject();</span>
+            }
+        }
+        else {
+<span class="pc bpc" id="L331" title="1 of 2 branches missed.">            if (c == '}') {</span>
+<span class="fc" id="L332">                return null;</span>
+            }
+            else {
+<span class="nc" id="L335">                throw JsonReadException.nonStringKeyInObject((char) c);</span>
+            }
+        }
+    }
+
+    private static boolean readUll(PushbackReader stream) throws IOException {
+<span class="pc bpc" id="L341" title="3 of 6 branches missed.">        return stream.read() == 'u' &amp;&amp; stream.read() == 'l' &amp;&amp; stream.read() == 'l';</span>
+    }
+
+    private static boolean readRue(PushbackReader stream) throws IOException {
+<span class="pc bpc" id="L345" title="3 of 6 branches missed.">        return stream.read() == 'r' &amp;&amp; stream.read() == 'u' &amp;&amp; stream.read() == 'e';</span>
+    }
+
+    private static boolean readAlse(PushbackReader stream) throws IOException {
+<span class="pc bpc" id="L349" title="4 of 8 branches missed.">        return stream.read() == 'a' &amp;&amp; stream.read() == 'l' &amp;&amp; stream.read() == 's' &amp;&amp; stream.read() == 'e';</span>
+    }
+
+    private static void readArrayHelperStream(
+            PushbackReader stream,
+            JsonStreamReadOptions options,
+            JsonArrayHandler arrayHandler
+    ) throws IOException {
+        while (true) {
+<span class="fc" id="L358">            readStream(stream, true, options, arrayHandler);</span>
+<span class="pc bpc" id="L359" title="1 of 3 branches missed.">            switch ((char) nextToken(stream)) {</span>
+                case ']':
+<span class="fc" id="L361">                    arrayHandler.onArrayEnd();</span>
+<span class="fc" id="L362">                    return;</span>
+                case ',':
+<span class="fc" id="L364">                    continue;</span>
+                default:
+<span class="nc" id="L366">                    throw JsonReadException.invalidArray();</span>
+            }
+        }
+    }
+
+    private static void readArrayStream(
+            PushbackReader stream,
+            JsonStreamReadOptions options,
+            JsonValueHandler valueHandler
+    ) throws IOException {
+<span class="fc" id="L376">        var arrayHandler = valueHandler.onArrayStart();</span>
+<span class="fc" id="L377">        var c = nextToken(stream);</span>
+<span class="pc bpc" id="L378" title="1 of 3 branches missed.">        switch (c) {</span>
+            case ']' -&gt;
+<span class="fc" id="L380">                    arrayHandler.onArrayEnd();</span>
+            case ',' -&gt;
+<span class="nc" id="L382">                    throw JsonReadException.invalidArray();</span>
+            default -&gt; {
+<span class="fc" id="L384">                stream.unread(c);</span>
+<span class="fc" id="L385">                readArrayHelperStream(stream, options, arrayHandler);</span>
+            }
+        }
+<span class="fc" id="L388">    }</span>
+
+    private static void readObjectStream(
+            PushbackReader stream,
+            JsonStreamReadOptions options,
+            JsonValueHandler valueHandler
+    ) throws IOException {
+<span class="fc" id="L395">        boolean readSomeEntry = false;</span>
+<span class="fc" id="L396">        var objectHandler = valueHandler.onObjectStart();</span>
+        while (true) {
+<span class="fc" id="L398">            var key = readKey(stream);</span>
+<span class="fc bfc" id="L399" title="All 2 branches covered.">            if (key != null) {</span>
+<span class="fc" id="L400">                readSomeEntry = true;</span>
+<span class="fc" id="L401">                var fieldHandler = objectHandler.onField(key);</span>
+<span class="fc" id="L402">                readStream(stream, true, options, fieldHandler);</span>
+<span class="pc bpc" id="L403" title="1 of 3 branches missed.">                switch (nextToken(stream)) {</span>
+                    case ',':
+<span class="fc" id="L405">                        continue;</span>
+                    case '}':
+<span class="fc" id="L407">                        objectHandler.onObjectEnd();</span>
+<span class="fc" id="L408">                        return;</span>
+                    default:
+<span class="nc" id="L410">                        throw JsonReadException.missingEntryInObject();</span>
+                }
+            }
+            else {
+<span class="pc bpc" id="L414" title="1 of 2 branches missed.">                if (readSomeEntry) {</span>
+<span class="nc" id="L415">                    throw JsonReadException.emptyEntryInObject();</span>
+                }
+                else {
+<span class="fc" id="L418">                    objectHandler.onObjectEnd();</span>
+<span class="fc" id="L419">                    return;</span>
+                }
+            }
+        }
+    }
+
+    public static void readStream(
+            PushbackReader stream,
+            boolean throwIfEofEncountered,
+            JsonStreamReadOptions options,
+            JsonValueHandler valueHandler
+    ) throws IOException {
+<span class="fc" id="L431">        int c = nextToken(stream);</span>
+<span class="fc bfc" id="L432" title="All 8 branches covered.">        switch (c) {</span>
+            case '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -&gt; {
+<span class="fc" id="L434">                stream.unread(c);</span>
+<span class="fc" id="L435">                valueHandler.onNumber(readNumber(stream));</span>
+<span class="fc" id="L436">            }</span>
+            case '&quot;' -&gt; {
+<span class="fc" id="L438">                valueHandler.onString(readQuotedString(stream));</span>
+<span class="fc" id="L439">            }</span>
+            case 'n' -&gt; {
+<span class="pc bpc" id="L441" title="1 of 2 branches missed.">                if (readUll(stream)) {</span>
+<span class="fc" id="L442">                    valueHandler.onNull();</span>
+                }
+                else {
+<span class="nc" id="L445">                    throw JsonReadException.expectedNull();</span>
+                }
+            }
+            case 't' -&gt; {
+<span class="pc bpc" id="L449" title="1 of 2 branches missed.">                if (readRue(stream)) {</span>
+<span class="fc" id="L450">                    valueHandler.onTrue();</span>
+                }
+                else {
+<span class="nc" id="L453">                    throw JsonReadException.expectedTrue();</span>
+                }
+            }
+            case 'f' -&gt; {
+<span class="pc bpc" id="L457" title="1 of 2 branches missed.">                if (readAlse(stream)) {</span>
+<span class="fc" id="L458">                    valueHandler.onFalse();</span>
+                }
+                else {
+<span class="nc" id="L461">                    throw JsonReadException.expectedFalse();</span>
+                }
+            }
+            case '{' -&gt; {
+<span class="fc" id="L465">                readObjectStream(stream, options, valueHandler);</span>
+<span class="fc" id="L466">            }</span>
+            case '[' -&gt; {
+<span class="fc" id="L468">                readArrayStream(stream, options, valueHandler);</span>
+<span class="fc" id="L469">            }</span>
+            default -&gt; {
+<span class="pc bpc" id="L471" title="1 of 2 branches missed.">                if (c &lt; 0) {</span>
+<span class="fc bfc" id="L472" title="All 2 branches covered.">                    if (throwIfEofEncountered) {</span>
+<span class="fc" id="L473">                        throw JsonReadException.unexpectedEOF();</span>
+                    }
+                }
+                else {
+<span class="nc" id="L477">                    throw JsonReadException.unexpectedCharacter((char) c);</span>
+                }
+            }
+        }
+<span class="fc" id="L481">    }</span>
+
+    public static Json read(PushbackReader stream, JsonReadOptions options) throws IOException {
+<span class="fc" id="L484">        var handler = new Handlers.BaseTreeValueHandler();</span>
+<span class="fc" id="L485">        readStream(stream, false, new JsonStreamReadOptions(), handler);</span>
+<span class="fc bfc" id="L486" title="All 4 branches covered.">        if (handler.result == null &amp;&amp; options.eofBehavior() == JsonReadOptions.EOFBehavior.THROW_EXCEPTION) {</span>
+<span class="fc" id="L487">            throw JsonReadException.unexpectedEOF();</span>
+        }
+        else {
+<span class="fc" id="L490">            return handler.result;</span>
+        }
+    }
+
+    public static Json readFullyConsume(PushbackReader stream, JsonReadOptions options) throws IOException {
+<span class="fc" id="L495">        var result = read(stream, options);</span>
+<span class="fc bfc" id="L496" title="All 2 branches covered.">        for (int c = stream.read(); c &gt; 0; c = stream.read()) {</span>
+<span class="fc bfc" id="L497" title="All 2 branches covered.">            switch (c) {</span>
+<span class="fc" id="L498">                case 9, 10, 13, 32 -&gt; {}</span>
+<span class="fc" id="L499">                default -&gt; throw JsonReadException.nonWhitespaceTrailingContents((char) c);</span>
+            }
+        }
+<span class="fc" id="L502">        return result;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

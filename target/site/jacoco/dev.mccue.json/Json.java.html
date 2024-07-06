@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Json.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">json</a> &gt; <a href="index.source.html" class="el_package">dev.mccue.json</a> &gt; <span class="el_source">Json.java</span></div><h1>Json.java</h1><pre class="source lang-java linenums">package dev.mccue.json;
+
+import dev.mccue.json.internal.*;
+import dev.mccue.json.stream.JsonStreamReadOptions;
+import dev.mccue.json.stream.JsonValueHandler;
+import org.jspecify.annotations.Nullable;
+
+import java.io.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
+/**
+ * &lt;p&gt;
+ *     Immutable tree representation of the json data model.
+ * &lt;/p&gt;
+ *
+ * &lt;p&gt;
+ *     The allowed implementors represent the different possible shapes Json can take.
+ * &lt;/p&gt;
+ *
+ * &lt;ul&gt;
+ *     &lt;li&gt;{@link JsonObject} - A map of {@link String} to {@link Json}.&lt;/li&gt;
+ *     &lt;li&gt;{@link JsonArray} - An array of {@link Json}.&lt;/li&gt;
+ *     &lt;li&gt;{@link JsonString} - A string.&lt;/li&gt;
+ *     &lt;li&gt;{@link JsonNumber} - A number.&lt;/li&gt;
+ *     &lt;li&gt;{@link JsonTrue} - true.&lt;/li&gt;
+ *     &lt;li&gt;{@link JsonFalse} - false.&lt;/li&gt;
+ *     &lt;li&gt;{@link JsonNull} - null.&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;p&gt;
+ *     There are no shared methods between those implementors, so this class just serves the purpose
+ *     of giving them a common supertype and to be a place for associated static methods.
+ * &lt;/p&gt;
+ *
+ * &lt;p&gt;
+ *     Unless otherwise specified, all factory methods in this interface are null-safe and will replace
+ *     any actual nulls with {@link JsonNull}.
+ * &lt;/p&gt;
+ *
+ * @author &lt;a href=&quot;ethan@mccue.dev&quot;&gt;Ethan McCue&lt;/a&gt;
+ */
+public sealed interface Json
+        extends Serializable, JsonEncodable
+        permits JsonBoolean, JsonNull, JsonString, JsonNumber, JsonArray, JsonObject {
+    /**
+     * Creates {@link Json} from something which implements {@link JsonEncodable},
+     * including {@link Json} itself.
+     *
+     * @param value The value to be encoded.
+     * @return An instance of {@link Json}.
+     */
+    static Json of(@Nullable JsonEncodable value) {
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        if (value == null) {</span>
+<span class="fc" id="L62">            return JsonNull.instance();</span>
+        }
+        else {
+<span class="fc" id="L65">            var asJson = value.toJson();</span>
+<span class="fc bfc" id="L66" title="All 2 branches covered.">            if (asJson == null) {</span>
+<span class="fc" id="L67">                return JsonNull.instance();</span>
+            }
+            else {
+<span class="fc" id="L70">                return asJson;</span>
+            }
+        }
+    }
+
+    /**
+     * Creates {@link Json} from a {@link BigDecimal}.
+     *
+     * @param value The value to be encoded.
+     * @return An instance of {@link Json}.
+     */
+    static Json of(@Nullable BigDecimal value) {
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        return value == null ? JsonNull.instance() : JsonNumber.of(value);</span>
+    }
+
+    /**
+     * Creates {@link Json} from a double.
+     *
+     * @param value The value to be encoded.
+     * @return An instance of {@link Json}.
+     */
+    static Json of(double value) {
+<span class="fc" id="L92">        return JsonNumber.of(value);</span>
+    }
+
+    /**
+     * Creates {@link Json} from a long.
+     *
+     * @param value The value to be encoded.
+     * @return An instance of {@link Json}.
+     */
+    static Json of(long value) {
+<span class="fc" id="L102">        return JsonNumber.of(value);</span>
+    }
+
+    /**
+     * Creates {@link Json} from a float.
+     *
+     * @param value The value to be encoded.
+     * @return An instance of {@link Json}.
+     */
+    static Json of(float value) {
+<span class="fc" id="L112">        return JsonNumber.of(value);</span>
+    }
+
+    /**
+     * Creates {@link Json} from an int.
+     *
+     * @param value The value to be encoded.
+     * @return An instance of {@link Json}.
+     */
+    static Json of(int value) {
+<span class="fc" id="L122">        return JsonNumber.of(value);</span>
+    }
+
+    /**
+     * Creates {@link Json} from a {@link Double}.
+     *
+     * @param value The value to be encoded.
+     * @return An instance of {@link Json}.
+     */
+    static Json of(@Nullable Double value) {
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">        return value == null ? JsonNull.instance() : of((double) value);</span>
+    }
+
+    /**
+     * Creates {@link Json} from a {@link Long}.
+     *
+     * @param value The value to be encoded.
+     * @return An instance of {@link Json}.
+     */
+    static Json of(@Nullable Long value) {
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">        return value == null ? JsonNull.instance() : of((long) value);</span>
+    }
+
+    /**
+     * Creates {@link Json} from a {@link Float}.
+     *
+     * @param value The value to be encoded.
+     * @return An instance of {@link Json}.
+     */
+    static Json of(@Nullable Float value) {
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">        return value == null ? JsonNull.instance() : of((float) value);</span>
+    }
+
+    /**
+     * Creates {@link Json} from an {@link Integer}.
+     *
+     * @param value The value to be encoded.
+     * @return An instance of {@link Json}.
+     */
+    static Json of(@Nullable Integer value) {
+<span class="fc bfc" id="L162" title="All 2 branches covered.">        return value == null ? JsonNull.instance() : of((int) value);</span>
+    }
+
+    /**
+     * Creates {@link Json} from a {@link BigInteger}.
+     *
+     * @param value The value to be encoded.
+     * @return An instance of {@link Json}.
+     */
+    static Json of(@Nullable BigInteger value) {
+<span class="fc bfc" id="L172" title="All 2 branches covered.">        return value == null ? JsonNull.instance() : JsonNumber.of(value);</span>
+    }
+
+    /**
+     * Creates {@link Json} from a {@link String}.
+     *
+     * @param value The value to be encoded.
+     * @return An instance of {@link Json}.
+     */
+    static Json of(@Nullable String value) {
+<span class="fc bfc" id="L182" title="All 2 branches covered.">        return value == null ? JsonNull.instance() : new StringImpl(value);</span>
+    }
+
+    /**
+     * Creates {@link Json} representing null.
+     * @return {@link Json} representing null.
+     */
+    static Json ofNull() {
+<span class="fc" id="L190">        return JsonNull.instance();</span>
+    }
+
+    /**
+     * Creates {@link Json} representing true.
+     * @return {@link Json} representing true.
+     */
+    static Json ofTrue() {
+<span class="fc" id="L198">        return JsonBoolean.of(true);</span>
+    }
+
+    /**
+     * Creates a {@link Json} representing false.
+     * @return {@link Json} representing false.
+     */
+    static Json ofFalse() {
+<span class="fc" id="L206">        return JsonBoolean.of(false);</span>
+    }
+
+
+    /**
+     * Creates {@link Json} from a boolean.
+     *
+     * @param value The value to be encoded.
+     * @return An instance of {@link Json}.
+     */
+    static Json of(boolean value) {
+<span class="nc" id="L217">        return JsonBoolean.of(value);</span>
+    }
+
+    /**
+     * Creates {@link Json} from a {@link Boolean}.
+     *
+     * @param value The value to be encoded.
+     * @return An instance of {@link Json}.
+     */
+    static Json of(@Nullable Boolean value) {
+<span class="pc bpc" id="L227" title="1 of 2 branches missed.">        return value == null ? JsonNull.instance() : JsonBoolean.of(value);</span>
+    }
+
+    /**
+     * Creates {@link Json} from a {@link Collection} of items which
+     * implement {@link JsonEncodable}.
+     *
+     * @param value The value to be encoded.
+     * @return An instance of {@link Json}.
+     */
+    static Json of(@Nullable Collection&lt;? extends @Nullable JsonEncodable&gt; value) {
+<span class="fc bfc" id="L238" title="All 2 branches covered.">        return value == null</span>
+<span class="fc" id="L239">                ? JsonNull.instance()</span>
+<span class="fc" id="L240">                : new ArrayImpl(</span>
+<span class="fc" id="L241">                        value.stream()</span>
+<span class="fc bfc" id="L242" title="All 2 branches covered.">                                .map(json -&gt; json == null ? JsonNull.instance() : json.toJson())</span>
+<span class="fc" id="L243">                                .toList()</span>
+                );
+    }
+
+    /**
+     * Creates {@link Json} from a {@link Collection} of items which
+     * can be encoded with a provided {@link JsonEncoder}.
+     *
+     * @param value The value to be encoded.
+     * @return An instance of {@link Json}.
+     */
+    static &lt;T extends @Nullable Object&gt; Json of(
+            @Nullable Collection&lt;? extends T&gt; value,
+            JsonEncoder&lt;T&gt; encoder
+    ) {
+<span class="pc bpc" id="L258" title="1 of 2 branches missed.">        return value == null</span>
+<span class="nc" id="L259">                ? JsonNull.instance()</span>
+<span class="fc" id="L260">                : new ArrayImpl(</span>
+<span class="fc" id="L261">                value.stream()</span>
+<span class="fc" id="L262">                        .map(v -&gt; {</span>
+<span class="fc" id="L263">                            var result = encoder.encode(v);</span>
+<span class="fc bfc" id="L264" title="All 2 branches covered.">                            if (result == null) {</span>
+<span class="fc" id="L265">                                return JsonNull.instance();</span>
+                            }
+                            else {
+<span class="fc" id="L268">                                return result;</span>
+                            }
+                        })
+<span class="fc" id="L271">                        .toList()</span>
+        );
+    }
+
+
+    /**
+     * Creates {@link Json} from a {@link Map} with {@link String} keys to values which
+     * implement {@link JsonEncodable}.
+     *
+     * &lt;p&gt;
+     *     Note that this method is null-safe when provided a null container,
+     *     but only null-safe for map values if the provided encoder also is.
+     * &lt;/p&gt;
+     *
+     * @param value The value to be encoded.
+     * @return An instance of {@link Json}.
+     */
+    static Json of(@Nullable Map&lt;String, ? extends @Nullable JsonEncodable&gt; value) {
+<span class="fc bfc" id="L289" title="All 2 branches covered.">        return value == null</span>
+<span class="fc" id="L290">                ? JsonNull.instance()</span>
+<span class="fc" id="L291">                : new ObjectImpl(</span>
+                        value
+<span class="fc" id="L293">                                .entrySet()</span>
+<span class="fc" id="L294">                                .stream()</span>
+<span class="fc" id="L295">                                .collect(Collectors.toUnmodifiableMap(</span>
+                                        Map.Entry::getKey,
+<span class="fc bfc" id="L297" title="All 2 branches covered.">                                        entry -&gt; entry.getValue() == null</span>
+<span class="fc" id="L298">                                                ? JsonNull.instance()</span>
+<span class="fc" id="L299">                                                : entry.getValue().toJson()</span>
+                                ))
+                );
+    }
+
+    /**
+     * Creates {@link Json} from a {@link Map} with {@link String} keys to values which
+     * can be encoded with a provided {@link JsonEncoder}.
+     *
+     * &lt;p&gt;
+     *     Note that this method is null-safe when provided a null container,
+     *     but only null-safe for map values if the provided encoder also is.
+     * &lt;/p&gt;
+     *
+     * @param value The value to be encoded.
+     * @return An instance of {@link Json}.
+     */
+    static &lt;T&gt; Json of(
+            @Nullable Map&lt;String, ? extends @Nullable T&gt; value,
+            JsonEncoder&lt;T&gt; encoder
+    ) {
+<span class="pc bpc" id="L320" title="1 of 2 branches missed.">        return value == null</span>
+<span class="nc" id="L321">                ? JsonNull.instance()</span>
+<span class="fc" id="L322">                : new ObjectImpl(</span>
+                value
+<span class="fc" id="L324">                        .entrySet()</span>
+<span class="fc" id="L325">                        .stream()</span>
+<span class="fc" id="L326">                        .collect(Collectors.toUnmodifiableMap(</span>
+                                Map.Entry::getKey,
+                                entry -&gt; {
+<span class="fc" id="L329">                                    var result = encoder.encode(entry.getValue());</span>
+<span class="pc bpc" id="L330" title="1 of 2 branches missed.">                                    if (result == null) {</span>
+<span class="nc" id="L331">                                        return JsonNull.instance();</span>
+                                    }
+                                    else {
+<span class="fc" id="L334">                                        return result;</span>
+                                    }
+                                }
+                        ))
+        );
+    }
+
+    /**
+     * Creates a new {@link JsonObject.Builder}.
+     *
+     * @return A new {@link JsonObject.Builder}.
+     */
+    static JsonObject.Builder objectBuilder() {
+<span class="fc" id="L347">        return JsonObject.builder();</span>
+    }
+
+    /**
+     * Creates a new {@link JsonObject.Builder} pre-filled with elements from a {@link Map}
+     * with {@link String} keys and values which implement {@link JsonEncodable}.
+     *
+     * @param value The value to pre-fill the builder with.
+     * @return A new {@link JsonObject.Builder}.
+     */
+    static JsonObject.Builder objectBuilder(Map&lt;String, ? extends JsonEncodable&gt; value) {
+<span class="pc bpc" id="L358" title="1 of 2 branches missed.">        if (value instanceof JsonObject o) {</span>
+<span class="nc" id="L359">            return new ObjectBuilder(new LinkedHashMap&lt;&gt;(o));</span>
+        }
+        else {
+<span class="fc" id="L362">            var objectEntries = new LinkedHashMap&lt;String, Json&gt;();</span>
+<span class="fc bfc" id="L363" title="All 2 branches covered.">            for (var entry : value.entrySet()) {</span>
+<span class="fc" id="L364">                objectEntries.put(entry.getKey(), Json.of(entry.getValue()));</span>
+<span class="fc" id="L365">            }</span>
+<span class="fc" id="L366">            return new ObjectBuilder(objectEntries);</span>
+        }
+    }
+
+    /**
+     * Convenience method to create a new array builder.
+     *
+     * @return A new array builder.
+     */
+    static JsonArray.Builder arrayBuilder() {
+<span class="fc" id="L376">        return JsonArray.builder();</span>
+    }
+
+    /**
+     * Convenience method to create a new array builder from a collection
+     * of {@link JsonEncodable} elements.
+     *
+     * @param elements A collection of elements which can be turned into {@link Json}.
+     * @return A new {@link JsonArray.Builder}.
+     */
+    static JsonArray.Builder arrayBuilder(Collection&lt;? extends @Nullable JsonEncodable&gt; elements) {
+<span class="nc bnc" id="L387" title="All 2 branches missed.">        if (elements instanceof JsonArray o) {</span>
+<span class="nc" id="L388">            return new ArrayBuilderImpl(new ArrayList&lt;&gt;(o));</span>
+        }
+        else {
+<span class="nc" id="L391">            return new ArrayBuilderImpl(new ArrayList&lt;&gt;(elements.stream()</span>
+<span class="nc" id="L392">                    .map(Json::of)</span>
+<span class="nc" id="L393">                    .toList()));</span>
+        }
+    }
+
+    /**
+     * Convenience method for creating an empty array.
+     *
+     * @return An empty {@link JsonArray}.
+     */
+    static JsonArray emptyArray() {
+<span class="fc" id="L403">        return ArrayImpl.EMPTY;</span>
+    }
+
+    /**
+     * Convenience method for creating an empty object.
+     *
+     * @return An empty {@link JsonObject}.
+     */
+    static JsonObject emptyObject() {
+<span class="fc" id="L412">        return ObjectImpl.EMPTY;</span>
+    }
+
+    /**
+     * Returns a {@link Collector} which makes a {@link JsonArray} as a terminal {@link java.util.stream.Stream}
+     * operation.
+     *
+     * @return A {@link Collector}.
+     */
+    static Collector&lt;JsonEncodable, ?, JsonArray&gt; arrayCollector() {
+<span class="fc" id="L422">        return JsonArray.collector();</span>
+    }
+
+    /**
+     * Returns a {@link Collector} which makes a {@link JsonObject} as a terminal {@link java.util.stream.Stream}
+     * operation.
+     *
+     * @param keyMapper Function to extract a {@link String} from the stream.
+     * @param valueMapper Function to extract something {@link JsonEncodable} from the stream.
+     * @return A {@link Collector}.
+     * @param &lt;T&gt; The type of element stored in the stream.
+     */
+    static &lt;T extends @Nullable Object&gt; Collector&lt;T, ?, JsonObject&gt; objectCollector(
+            Function&lt;? super T, String&gt; keyMapper,
+            Function&lt;? super T, ? extends JsonEncodable&gt; valueMapper
+    ) {
+<span class="fc" id="L438">        return JsonObject.collector(keyMapper, valueMapper);</span>
+    }
+
+    /**
+     * Vacuous implementation to make methods like {@link Json#of(java.util.Collection)}
+     * and {@link Json#of(java.util.Map)} convenient to create.
+     *
+     * @return Itself.
+     */
+    @Override
+    default Json toJson() {
+<span class="fc" id="L449">        return this;</span>
+    }
+
+
+    /**
+     * Reads the given text as {@link Json}
+     *
+     * &lt;p&gt;
+     *     Only expects to read a single form. Will throw if there is non-whitespace content
+     *     at the end.
+     * &lt;/p&gt;
+     *
+     * @param jsonText The text to read.
+     * @return {@link Json}
+     * @throws JsonReadException If the input {@link Json} is malformed.
+     */
+    static Json readString(CharSequence jsonText) throws JsonReadException {
+<span class="fc" id="L466">        return readString(jsonText, new JsonReadOptions());</span>
+    }
+
+    static Json readString(CharSequence jsonText, JsonReadOptions options) throws JsonReadException {
+        try {
+<span class="fc" id="L471">            return JsonReaderMethods.readFullyConsume(new PushbackReader(</span>
+<span class="fc" id="L472">                    new StringReader(jsonText.toString())</span>
+            ), options);
+<span class="nc" id="L474">        } catch (IOException e) {</span>
+<span class="nc" id="L475">            throw new UncheckedIOException(e);</span>
+        }
+    }
+
+    static Json read(Reader reader, JsonReadOptions options) throws IOException, JsonReadException {
+<span class="fc" id="L480">        return JsonReaderMethods.readFullyConsume(</span>
+                new PushbackReader(reader),
+                options
+        );
+    }
+
+    static Json read(Reader reader) throws IOException, JsonReadException {
+<span class="fc" id="L487">        return read(reader, new JsonReadOptions());</span>
+    }
+
+    static JsonReader reader(Reader reader, JsonReadOptions options) {
+<span class="fc" id="L491">        var pushbackReader = new PushbackReader(</span>
+                reader
+        );
+<span class="fc" id="L494">        return () -&gt; {</span>
+            try {
+<span class="fc" id="L496">                return JsonReaderMethods.read(pushbackReader, options);</span>
+<span class="nc" id="L497">            } catch (IOException e) {</span>
+<span class="nc" id="L498">                throw new UncheckedIOException(e);</span>
+            }
+        };
+    }
+
+    static JsonReader reader(Reader reader) {
+<span class="fc" id="L504">        return reader(reader, new JsonReadOptions()</span>
+<span class="fc" id="L505">                .withEOFBehavior(JsonReadOptions.EOFBehavior.RETURN_NULL));</span>
+    }
+
+    static void readStream(Reader reader, JsonValueHandler handler, JsonStreamReadOptions options) throws IOException, JsonReadException {
+<span class="nc" id="L509">        JsonReaderMethods.readStream(</span>
+                new PushbackReader(reader),
+                false,
+                options,
+                handler
+        );
+<span class="nc" id="L515">    }</span>
+
+    static void readStream(Reader reader, JsonValueHandler handler) throws IOException, JsonReadException {
+<span class="nc" id="L518">        JsonReaderMethods.readStream(</span>
+                new PushbackReader(reader),
+                false,
+                new JsonStreamReadOptions(),
+                handler
+        );
+<span class="nc" id="L524">    }</span>
+
+    private static String writeString(Json json) {
+<span class="fc" id="L527">        return writeString(json, new JsonWriteOptions());</span>
+    }
+
+    private static String writeString(Json json, JsonWriteOptions options) {
+<span class="fc" id="L531">        var sw = new StringWriter();</span>
+        try {
+<span class="fc" id="L533">            write(json, sw, options);</span>
+<span class="nc" id="L534">        } catch (IOException e) {</span>
+<span class="nc" id="L535">            throw new UncheckedIOException(e);</span>
+<span class="fc" id="L536">        }</span>
+<span class="fc" id="L537">        return sw.toString();</span>
+    }
+
+    static String writeString(@Nullable JsonEncodable jsonEncodable) {
+<span class="fc" id="L541">        return writeString(Json.of(jsonEncodable));</span>
+    }
+
+    static String writeString(@Nullable JsonEncodable jsonEncodable, JsonWriteOptions options) {
+<span class="nc" id="L545">        return writeString(Json.of(jsonEncodable), options);</span>
+    }
+
+    private static void write(Json json, Writer writer, JsonWriteOptions options) throws IOException {
+<span class="fc" id="L549">        new JsonWriter().write(json, writer, options);</span>
+<span class="fc" id="L550">    }</span>
+
+    private static void write(Json json, Writer writer) throws IOException {
+<span class="nc" id="L553">        new JsonWriter().write(json, writer, new JsonWriteOptions());</span>
+<span class="nc" id="L554">    }</span>
+
+    static void write(@Nullable JsonEncodable jsonEncodable, Writer writer, JsonWriteOptions options) throws IOException {
+<span class="nc" id="L557">        write(Json.of(jsonEncodable), writer, options);</span>
+<span class="nc" id="L558">    }</span>
+
+    static void write(@Nullable JsonEncodable jsonEncodable, Writer writer) throws IOException {
+<span class="nc" id="L561">        write(Json.of(jsonEncodable), writer);</span>
+<span class="nc" id="L562">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

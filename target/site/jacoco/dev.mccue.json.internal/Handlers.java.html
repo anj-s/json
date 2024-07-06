@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Handlers.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">json</a> &gt; <a href="index.source.html" class="el_package">dev.mccue.json.internal</a> &gt; <span class="el_source">Handlers.java</span></div><h1>Handlers.java</h1><pre class="source lang-java linenums">package dev.mccue.json.internal;
+
+import dev.mccue.json.*;
+import dev.mccue.json.stream.JsonArrayHandler;
+import dev.mccue.json.stream.JsonObjectHandler;
+import dev.mccue.json.stream.JsonValueHandler;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.Consumer;
+
+final class Handlers {
+    private Handlers() {}
+
+    @ValueCandidate
+<span class="fc" id="L15">    record TreeObjectHandler(JsonObject.Builder builder, Consumer&lt;JsonObject&gt; onObject) implements JsonObjectHandler {</span>
+        TreeObjectHandler(Consumer&lt;JsonObject&gt; onObject) {
+<span class="fc" id="L17">            this(Json.objectBuilder(), onObject);</span>
+<span class="fc" id="L18">        }</span>
+
+        @Override
+        public JsonValueHandler onField(java.lang.String fieldName) {
+<span class="fc" id="L22">            return new TreeValueHandler(value -&gt; builder.put(fieldName, value));</span>
+        }
+
+        @Override
+        public void onObjectEnd() {
+<span class="fc" id="L27">            onObject.accept(((ObjectBuilder) builder).buildInternal());</span>
+<span class="fc" id="L28">        }</span>
+    }
+
+    @ValueCandidate
+<span class="fc" id="L32">    record TreeArrayHandler(</span>
+            JsonArray.Builder builder,
+            Consumer&lt;JsonArray&gt; onArray
+    ) implements JsonArrayHandler {
+        TreeArrayHandler(Consumer&lt;JsonArray&gt; onArray) {
+<span class="fc" id="L37">            this(Json.arrayBuilder(), onArray);</span>
+<span class="fc" id="L38">        }</span>
+
+        @Override
+        public void onArrayEnd() {
+<span class="fc" id="L42">            onArray.accept(((ArrayBuilderImpl) builder).buildInternal());</span>
+<span class="fc" id="L43">        }</span>
+
+        @Override
+        public JsonObjectHandler onObjectStart() {
+<span class="fc" id="L47">            return new TreeObjectHandler(builder::add);</span>
+        }
+
+        @Override
+        public JsonArrayHandler onArrayStart() {
+<span class="nc" id="L52">            return new TreeArrayHandler(builder::add);</span>
+        }
+
+        @Override
+        public void onNumber(JsonNumber number) {
+<span class="fc" id="L57">            builder.add(number);</span>
+<span class="fc" id="L58">        }</span>
+
+        @Override
+        public void onString(java.lang.String value) {
+<span class="fc" id="L62">            builder.add(JsonString.of(value));</span>
+<span class="fc" id="L63">        }</span>
+
+        @Override
+        public void onNull() {
+<span class="nc" id="L67">            builder.add(Json.ofNull());</span>
+<span class="nc" id="L68">        }</span>
+
+        @Override
+        public void onTrue() {
+<span class="fc" id="L72">            builder.add(Json.ofTrue());</span>
+<span class="fc" id="L73">        }</span>
+
+        @Override
+        public void onFalse() {
+<span class="fc" id="L77">            builder.add(Json.ofFalse());</span>
+<span class="fc" id="L78">        }</span>
+    }
+
+    /**
+     * Basic handler that reads values into an immutable tree.
+     */
+    @ValueCandidate
+<span class="fc" id="L85">    record TreeValueHandler(Consumer&lt;Json&gt; onValue) implements JsonValueHandler {</span>
+
+        @Override
+        public JsonObjectHandler onObjectStart() {
+<span class="fc" id="L89">            return new TreeObjectHandler(onValue::accept);</span>
+        }
+
+        @Override
+        public JsonArrayHandler onArrayStart() {
+<span class="fc" id="L94">            return new TreeArrayHandler(onValue::accept);</span>
+        }
+
+        @Override
+        public void onNumber(JsonNumber number) {
+<span class="fc" id="L99">            onValue.accept(number);</span>
+<span class="fc" id="L100">        }</span>
+
+        @Override
+        public void onString(String value) {
+<span class="fc" id="L104">            onValue.accept(JsonString.of(value));</span>
+<span class="fc" id="L105">        }</span>
+
+        @Override
+        public void onNull() {
+<span class="fc" id="L109">            onValue.accept(Json.ofNull());</span>
+<span class="fc" id="L110">        }</span>
+
+        @Override
+        public void onTrue() {
+<span class="nc" id="L114">            onValue.accept(Json.ofTrue());</span>
+<span class="nc" id="L115">        }</span>
+
+        @Override
+        public void onFalse() {
+<span class="nc" id="L119">            onValue.accept(Json.ofFalse());</span>
+<span class="nc" id="L120">        }</span>
+    }
+
+    static final class BaseTreeValueHandler implements JsonValueHandler {
+        @Nullable Json result;
+        final TreeValueHandler delegate;
+
+<span class="fc" id="L127">        BaseTreeValueHandler() {</span>
+<span class="fc" id="L128">            this.result = null;</span>
+<span class="fc" id="L129">            this.delegate = new TreeValueHandler(value -&gt; this.result = value);</span>
+<span class="fc" id="L130">        }</span>
+
+        @Override
+        public JsonObjectHandler onObjectStart() {
+<span class="fc" id="L134">            return delegate.onObjectStart();</span>
+        }
+
+        @Override
+        public JsonArrayHandler onArrayStart() {
+<span class="fc" id="L139">            return delegate.onArrayStart();</span>
+        }
+
+        @Override
+        public void onNumber(JsonNumber number) {
+<span class="fc" id="L144">            delegate.onNumber(number);</span>
+<span class="fc" id="L145">        }</span>
+
+        @Override
+        public void onString(java.lang.String value) {
+<span class="fc" id="L149">            delegate.onString(value);</span>
+<span class="fc" id="L150">        }</span>
+
+        @Override
+        public void onNull() {
+<span class="nc" id="L154">            delegate.onNull();</span>
+<span class="nc" id="L155">        }</span>
+
+        @Override
+        public void onTrue() {
+<span class="nc" id="L159">            delegate.onTrue();</span>
+<span class="nc" id="L160">        }</span>
+
+        @Override
+        public void onFalse() {
+<span class="nc" id="L164">            delegate.onFalse();</span>
+<span class="nc" id="L165">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

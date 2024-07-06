@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonArray.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">json</a> &gt; <a href="index.source.html" class="el_package">dev.mccue.json</a> &gt; <span class="el_source">JsonArray.java</span></div><h1>JsonArray.java</h1><pre class="source lang-java linenums">package dev.mccue.json;
+
+
+import dev.mccue.json.internal.ArrayBuilderImpl;
+import dev.mccue.json.internal.ArrayImpl;
+import org.jspecify.annotations.Nullable;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
+/**
+ * Represents an array in the json data model.
+ *
+ * @author &lt;a href=&quot;ethan@mccue.dev&quot;&gt;Ethan McCue&lt;/a&gt;
+ */
+public sealed interface JsonArray extends Json, List&lt;Json&gt; permits ArrayImpl {
+    static JsonArray of(Json... values) {
+<span class="fc" id="L21">        return of(Arrays.asList(values));</span>
+    }
+
+    static JsonArray of(List&lt;Json&gt; value) {
+<span class="fc" id="L25">        return new ArrayImpl(List.copyOf(value));</span>
+    }
+
+    static Builder builder() {
+<span class="fc" id="L29">        return new ArrayBuilderImpl();</span>
+    }
+
+    static Builder builder(int initialCapacity) {
+<span class="nc" id="L33">        return new ArrayBuilderImpl(initialCapacity);</span>
+    }
+
+    /**
+     * Returns a {@link Collector} which makes a {@link JsonArray} as a terminal {@link java.util.stream.Stream}
+     * operation.
+     *
+     * @return A {@link Collector}
+     */
+    static Collector&lt;JsonEncodable, ?, JsonArray&gt; collector() {
+<span class="fc" id="L43">        return Collector.of(</span>
+                JsonArray::builder,
+<span class="fc" id="L45">                (JsonArray.Builder builder, JsonEncodable o) -&gt; builder.add(o.toJson()),</span>
+                (a, b) -&gt; {
+<span class="nc" id="L47">                    var impl = (ArrayBuilderImpl) b;</span>
+<span class="nc" id="L48">                    a.addAll(impl.values());</span>
+<span class="nc" id="L49">                    return a;</span>
+                },
+                JsonArray.Builder::build
+        );
+    }
+
+    static JsonArray empty() {
+<span class="nc" id="L56">        return ArrayImpl.EMPTY;</span>
+    }
+
+    sealed interface Builder extends JsonEncodable permits ArrayBuilderImpl {
+        Builder add(@Nullable Json value);
+        Builder addAll(Collection&lt;? extends @Nullable JsonEncodable&gt; value);
+        default Builder add(@Nullable JsonEncodable value) {
+<span class="nc" id="L63">            return add(Json.of(value));</span>
+        }
+
+        default Builder add(@Nullable BigDecimal value) {
+<span class="nc" id="L67">            return add(Json.of(value));</span>
+        }
+
+        default Builder add(double value) {
+<span class="nc" id="L71">            return add(Json.of(value));</span>
+        }
+
+        default Builder add(long value) {
+<span class="nc" id="L75">            return add(Json.of(value));</span>
+        }
+
+        default Builder add(float value) {
+<span class="nc" id="L79">            return add(Json.of(value));</span>
+        }
+
+        default Builder add(int value) {
+<span class="nc" id="L83">            return add(Json.of(value));</span>
+        }
+
+        default Builder add(@Nullable Double value) {
+<span class="nc" id="L87">            return add(Json.of(value));</span>
+        }
+
+        default Builder add(@Nullable Long value) {
+<span class="nc" id="L91">            return add(Json.of(value));</span>
+        }
+
+        default Builder add(@Nullable Float value) {
+<span class="nc" id="L95">            return add(Json.of(value));</span>
+        }
+
+        default Builder add(@Nullable Integer value) {
+<span class="nc" id="L99">            return add(Json.of(value));</span>
+        }
+
+        default Builder add(@Nullable BigInteger value) {
+<span class="nc" id="L103">            return add(Json.of(value));</span>
+        }
+
+        default Builder add(@Nullable String value) {
+<span class="fc" id="L107">            return add(Json.of(value));</span>
+        }
+
+        default Builder addNull() {
+<span class="nc" id="L111">            return add(Json.ofNull());</span>
+        }
+
+        default Builder addTrue() {
+<span class="nc" id="L115">            return add(Json.ofTrue());</span>
+        }
+
+        default Builder addFalse() {
+<span class="nc" id="L119">            return add(Json.ofFalse());</span>
+        }
+
+        default Builder add(boolean b) {
+<span class="nc" id="L123">            return add(Json.of(b));</span>
+        }
+
+        default Builder add(@Nullable Boolean b) {
+<span class="nc" id="L127">            return add(Json.of(b));</span>
+        }
+
+        JsonArray build();
+
+        @Override
+        default Json toJson() {
+<span class="nc" id="L134">            return build();</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

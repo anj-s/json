@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonIntegerImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">json</a> &gt; <a href="index.source.html" class="el_package">dev.mccue.json.internal</a> &gt; <span class="el_source">JsonIntegerImpl.java</span></div><h1>JsonIntegerImpl.java</h1><pre class="source lang-java linenums">package dev.mccue.json.internal;
+
+import dev.mccue.json.Json;
+import dev.mccue.json.JsonInteger;
+import dev.mccue.json.serialization.JsonSerializationProxy;
+
+import java.io.Serial;
+import java.math.BigInteger;
+
+public final class JsonIntegerImpl extends JsonInteger {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private final String value;
+
+<span class="fc" id="L16">    public JsonIntegerImpl(String value) {</span>
+<span class="fc" id="L17">        this.value = value;</span>
+<span class="fc" id="L18">    }</span>
+
+    @Override
+    public java.math.BigDecimal bigDecimalValue() {
+<span class="fc" id="L22">        return new java.math.BigDecimal(bigIntegerValue());</span>
+    }
+
+    @Override
+    public java.math.BigInteger bigIntegerValue() {
+<span class="fc" id="L27">        return new BigInteger(value);</span>
+    }
+
+    @Override
+    public int intValueExact() {
+<span class="fc" id="L32">        return bigIntegerValue().intValueExact();</span>
+    }
+
+    @Override
+    public long longValueExact() {
+<span class="fc" id="L37">        return bigIntegerValue().longValueExact();</span>
+    }
+
+    @Override
+    public java.math.BigInteger bigIntegerValueExact() {
+<span class="nc" id="L42">        return bigIntegerValue();</span>
+    }
+
+    @Override
+    public boolean isIntegral() {
+<span class="fc" id="L47">        return true;</span>
+    }
+
+    @Override
+    public int intValue() {
+<span class="nc" id="L52">        return Integer.parseInt(value);</span>
+    }
+
+    @Override
+    public long longValue() {
+<span class="nc" id="L57">        return Long.parseLong(value);</span>
+    }
+
+    @Override
+    public float floatValue() {
+<span class="nc" id="L62">        return Float.parseFloat(value);</span>
+    }
+
+    @Override
+    public double doubleValue() {
+<span class="nc" id="L67">        return Double.parseDouble(value);</span>
+    }
+
+    @Override
+    public java.lang.String toString() {
+<span class="fc" id="L72">        return this.value;</span>
+    }
+
+    @Serial
+    private Object writeReplace() {
+<span class="nc" id="L77">        return new JsonSerializationProxy(Json.writeString(this));</span>
+    }
+
+    @Serial
+    private Object readResolve() {
+<span class="nc" id="L82">        throw new IllegalStateException();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

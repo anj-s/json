@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonTrue.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">json</a> &gt; <a href="index.source.html" class="el_package">dev.mccue.json</a> &gt; <span class="el_source">JsonTrue.java</span></div><h1>JsonTrue.java</h1><pre class="source lang-java linenums">package dev.mccue.json;
+
+import dev.mccue.json.internal.ValueCandidate;
+import dev.mccue.json.serialization.JsonSerializationProxy;
+import dev.mccue.json.stream.JsonGenerator;
+
+import java.io.Serial;
+
+/**
+ * Represents true in the json data model.
+ *
+ * @author &lt;a href=&quot;ethan@mccue.dev&quot;&gt;Ethan McCue&lt;/a&gt;
+ */
+@ValueCandidate
+public final class JsonTrue implements JsonBoolean {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+<span class="fc" id="L19">    private static final JsonTrue INSTANCE = new JsonTrue();</span>
+
+    private JsonTrue() {}
+
+    /**
+     * Returns an instance of {@link JsonTrue}. Guaranteed to be comparable with ==,
+     * but not to be safe for identity sensitive operations.
+     *
+     * @return An instance of {@link JsonTrue}
+     */
+    public static JsonTrue instance() {
+<span class="fc" id="L30">        return INSTANCE;</span>
+    }
+
+    /**
+     * Returns true.
+     *
+     * @return true.
+     */
+    @Override
+    public boolean value() {
+<span class="nc" id="L40">        return true;</span>
+    }
+
+    @Override
+    public java.lang.String toString() {
+<span class="fc" id="L45">        return &quot;true&quot;;</span>
+    }
+
+    @Serial
+    private Object writeReplace() {
+<span class="nc" id="L50">        return new JsonSerializationProxy(Json.writeString(this));</span>
+    }
+
+    @Serial
+    private Object readResolve() {
+<span class="fc" id="L55">        throw new IllegalStateException();</span>
+    }
+
+    @Override
+    public void write(JsonGenerator generator) {
+<span class="fc" id="L60">        generator.writeTrue();</span>
+<span class="fc" id="L61">    }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

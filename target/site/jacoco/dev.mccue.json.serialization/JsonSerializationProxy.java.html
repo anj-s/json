@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonSerializationProxy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">json</a> &gt; <a href="index.source.html" class="el_package">dev.mccue.json.serialization</a> &gt; <span class="el_source">JsonSerializationProxy.java</span></div><h1>JsonSerializationProxy.java</h1><pre class="source lang-java linenums">package dev.mccue.json.serialization;
+
+import dev.mccue.json.Json;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Objects;
+
+/**
+ * Serialization proxy for the JSON tree structure represented by this
+ * library.
+ *
+ * &lt;p&gt;
+ *     The string contained within this record should be json. If it is not
+ *     it will simply fail to read back in.
+ * &lt;/p&gt;
+ *
+ * &lt;p&gt;
+ *     This exists so that the internal representation used for JSON can be evolved
+ *     freely.
+ * &lt;/p&gt;
+ *
+ * @param json A string representation of the JSON being serialized.
+ * @author &lt;a href=&quot;ethan@mccue.dev&quot;&gt;Ethan McCue&lt;/a&gt;
+ */
+public record JsonSerializationProxy(String json) implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+<span class="fc" id="L30">    public JsonSerializationProxy {</span>
+<span class="fc" id="L31">        Objects.requireNonNull(json);</span>
+<span class="fc" id="L32">    }</span>
+
+    @Serial
+    public Object readResolve() {
+<span class="fc" id="L36">        return Json.readString(json);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

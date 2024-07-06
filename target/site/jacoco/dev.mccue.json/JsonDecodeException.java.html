@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonDecodeException.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">json</a> &gt; <a href="index.source.html" class="el_package">dev.mccue.json</a> &gt; <span class="el_source">JsonDecodeException.java</span></div><h1>JsonDecodeException.java</h1><pre class="source lang-java linenums">package dev.mccue.json;
+
+import java.io.Serial;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * &lt;p&gt;
+ *    An exception to be thrown when failing to &quot;decode&quot; some JSON into
+ *    another shape.
+ * &lt;/p&gt;
+ *
+ * @author &lt;a href=&quot;ethan@mccue.dev&quot;&gt;Ethan McCue&lt;/a&gt;
+ */
+public sealed abstract class JsonDecodeException extends RuntimeException {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    JsonDecodeException() {
+<span class="nc" id="L21">        super();</span>
+<span class="nc" id="L22">    }</span>
+
+    JsonDecodeException(String message) {
+<span class="nc" id="L25">        super(message);</span>
+<span class="nc" id="L26">    }</span>
+
+    JsonDecodeException(Throwable cause) {
+<span class="nc" id="L29">        super(cause);</span>
+<span class="nc" id="L30">    }</span>
+
+    public static AtField atField(String fieldName, JsonDecodeException error) {
+<span class="nc" id="L33">        return new AtField(fieldName, error);</span>
+    }
+
+    public static AtIndex atIndex(int index, JsonDecodeException error) {
+<span class="nc" id="L37">        return new AtIndex(index, error);</span>
+    }
+
+    public static OneOf oneOf(List&lt;JsonDecodeException&gt; errors) {
+<span class="nc" id="L41">        return new OneOf(errors);</span>
+    }
+
+    public static Failure of(String message, Json value) {
+<span class="nc" id="L45">        return new Failure(message, value);</span>
+    }
+
+    public static Failure of(Throwable cause, Json value) {
+<span class="nc" id="L49">        return new Failure(cause, value);</span>
+    }
+
+    public static final class AtField extends JsonDecodeException {
+        @Serial
+        private static final long serialVersionUID = 1L;
+        private final String fieldName;
+        private final JsonDecodeException error;
+
+<span class="nc" id="L58">        private AtField(String fieldName, JsonDecodeException error) {</span>
+<span class="nc" id="L59">            Objects.requireNonNull(fieldName, &quot;fieldName must not be null&quot;);</span>
+<span class="nc" id="L60">            Objects.requireNonNull(error, &quot;error must not be null&quot;);</span>
+<span class="nc" id="L61">            this.fieldName = fieldName;</span>
+<span class="nc" id="L62">            this.error = error;</span>
+<span class="nc" id="L63">        }</span>
+
+        public String fieldName() {
+<span class="nc" id="L66">            return this.fieldName;</span>
+        }
+
+<span class="nc" id="L69">        public JsonDecodeException error() { return this.error; }</span>
+
+        @Override
+        public String getMessage() {
+<span class="nc" id="L73">            return getMessage(this);</span>
+        }
+    }
+
+    public static final class AtIndex extends JsonDecodeException {
+        @Serial
+        private static final long serialVersionUID = 1L;
+        private final int index;
+        private final JsonDecodeException error;
+
+<span class="nc" id="L83">        private AtIndex(int index, JsonDecodeException error) {</span>
+<span class="nc" id="L84">            Objects.requireNonNull(error);</span>
+<span class="nc" id="L85">            this.index = index;</span>
+<span class="nc" id="L86">            this.error = error;</span>
+<span class="nc" id="L87">        }</span>
+
+        public int index() {
+<span class="nc" id="L90">            return this.index;</span>
+        }
+
+        public JsonDecodeException error() {
+<span class="nc" id="L94">            return this.error;</span>
+        }
+
+        @Override
+        public String getMessage() {
+<span class="nc" id="L99">            return getMessage(this);</span>
+        }
+    }
+
+    public static final class OneOf extends JsonDecodeException {
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        @SuppressWarnings(&quot;serial&quot;)
+        private final List&lt;JsonDecodeException&gt; errors;
+
+<span class="nc" id="L110">        private OneOf(List&lt;JsonDecodeException&gt; errors) {</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">            if (errors.size() == 0) {</span>
+<span class="nc" id="L112">                throw new IllegalArgumentException(&quot;errors must be non-empty&quot;);</span>
+            }
+<span class="nc" id="L114">            Objects.requireNonNull(errors, &quot;errors of errors must not be null&quot;);</span>
+<span class="nc" id="L115">            errors.forEach(error -&gt; Objects.requireNonNull(error, &quot;every error must not be null&quot;));</span>
+<span class="nc" id="L116">            this.errors = List.copyOf(errors);</span>
+<span class="nc" id="L117">        }</span>
+
+        public List&lt;JsonDecodeException&gt; errors() {
+<span class="nc" id="L120">            return errors;</span>
+        }
+
+        @Override
+        public String getMessage() {
+<span class="nc" id="L125">            return getMessage(this);</span>
+        }
+    }
+
+    public static final class Failure extends JsonDecodeException {
+        @Serial
+        private static final long serialVersionUID = 1L;
+        private final Json value;
+
+        private Failure(String reason, Json value) {
+<span class="nc" id="L135">            super(reason);</span>
+<span class="nc" id="L136">            this.value = value;</span>
+<span class="nc" id="L137">        }</span>
+
+        private Failure(Throwable cause, Json value) {
+<span class="nc" id="L140">            super(cause);</span>
+<span class="nc" id="L141">            this.value = value;</span>
+<span class="nc" id="L142">        }</span>
+
+        public Json value() {
+<span class="nc" id="L145">            return value;</span>
+        }
+
+        @Override
+        public String getMessage() {
+<span class="nc" id="L150">            return super.getMessage();</span>
+        }
+    }
+
+    private static String indent(String string) {
+<span class="nc" id="L155">        return String.join(&quot;\n    &quot;, string.split(&quot;\n&quot;));</span>
+    }
+
+    private static String getMessageHelp(JsonDecodeException error, ArrayList&lt;String&gt; context) {
+<span class="nc bnc" id="L159" title="All 4 branches missed.">        switch (error) {</span>
+<span class="nc" id="L160">            case AtField atField -&gt; {</span>
+<span class="nc" id="L161">                var fieldName = atField.fieldName();</span>
+<span class="nc" id="L162">                var err = atField.error();</span>
+
+                boolean isSimple;
+<span class="nc bnc" id="L165" title="All 2 branches missed.">                if (fieldName.isEmpty()) {</span>
+<span class="nc" id="L166">                    isSimple = false;</span>
+                } else {
+<span class="nc" id="L168">                    isSimple = Character.isAlphabetic(fieldName.charAt(0));</span>
+<span class="nc bnc" id="L169" title="All 2 branches missed.">                    for (int i = 1; i &lt; fieldName.length(); i++) {</span>
+<span class="nc bnc" id="L170" title="All 6 branches missed.">                        isSimple = isSimple &amp;&amp; (Character.isAlphabetic(fieldName.charAt(i)) || Character.isDigit(fieldName.charAt(i)));</span>
+                    }
+                }
+
+<span class="nc bnc" id="L174" title="All 2 branches missed.">                fieldName = isSimple ? &quot;.&quot; + fieldName : &quot;[&quot; + fieldName + &quot;]&quot;;</span>
+
+<span class="nc" id="L176">                context.add(fieldName);</span>
+
+<span class="nc" id="L178">                return getMessageHelp(err, context);</span>
+            }
+<span class="nc" id="L180">            case AtIndex atIndex -&gt; {</span>
+<span class="nc" id="L181">                var indexName = &quot;[&quot; + atIndex.index() + &quot;]&quot;;</span>
+<span class="nc" id="L182">                context.add(indexName);</span>
+<span class="nc" id="L183">                return getMessageHelp(atIndex.error(), context);</span>
+            }
+<span class="nc" id="L185">            case OneOf oneOf -&gt; {</span>
+<span class="nc bnc" id="L186" title="All 2 branches missed.">                if (oneOf.errors().isEmpty()) {</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">                    return &quot;Ran into oneOf with no possibilities&quot; + (context.isEmpty() ? &quot;!&quot; : &quot; at json&quot; + String.join(&quot;&quot;, context));</span>
+<span class="nc bnc" id="L188" title="All 2 branches missed.">                } else if (oneOf.errors().size() == 1) {</span>
+<span class="nc" id="L189">                    return getMessageHelp(oneOf.errors().get(0), context);</span>
+                } else {
+<span class="nc bnc" id="L191" title="All 2 branches missed.">                    var starter = (context.isEmpty() ? &quot;oneOf&quot; : &quot;oneOf at json&quot; + String.join(&quot;&quot;, context));</span>
+<span class="nc" id="L192">                    var introduction = starter + &quot; failed in the following &quot; + oneOf.errors().size() + &quot; ways:&quot;;</span>
+<span class="nc" id="L193">                    var msg = new StringBuilder(introduction + &quot;\n\n&quot;);</span>
+<span class="nc bnc" id="L194" title="All 2 branches missed.">                    for (int i = 0; i &lt; oneOf.errors().size(); i++) {</span>
+<span class="nc" id="L195">                        msg.append(&quot;\n\n(&quot;);</span>
+<span class="nc" id="L196">                        msg.append(i + 1);</span>
+<span class="nc" id="L197">                        msg.append(&quot;) &quot;);</span>
+<span class="nc" id="L198">                        msg.append(indent(getMessage(oneOf.errors().get(i))));</span>
+<span class="nc bnc" id="L199" title="All 2 branches missed.">                        if (i != oneOf.errors().size() - 1) {</span>
+<span class="nc" id="L200">                            msg.append(&quot;\n\n&quot;);</span>
+                        }
+                    }
+
+<span class="nc" id="L204">                    return msg.toString();</span>
+                }
+            }
+<span class="nc" id="L207">            case Failure failure -&gt; {</span>
+<span class="nc" id="L208">                var msg = failure.getMessage();</span>
+<span class="nc" id="L209">                var json = failure.value;</span>
+
+                var introduction = (
+<span class="nc bnc" id="L212" title="All 2 branches missed.">                        context.isEmpty()</span>
+<span class="nc" id="L213">                                ? &quot;Problem with the given value:\n\n    &quot;</span>
+<span class="nc" id="L214">                                : &quot;Problem with the value at json&quot; + String.join(&quot;&quot;, context) + &quot;:\n\n    &quot;</span>
+                );
+
+<span class="nc" id="L217">                return introduction + indent(Json.writeString(json, new JsonWriteOptions().withIndentation(4))) + &quot;\n\n&quot; + msg;</span>
+            }
+        }
+    }
+
+    protected static String getMessage(JsonDecodeException error) {
+<span class="nc" id="L223">        return getMessageHelp(error, new ArrayList&lt;&gt;());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
