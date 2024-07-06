@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="11" failures="0" name="dev.mccue.json.JsonParsingTest" time="0.074" errors="0" skipped="0">
+<testsuite tests="11" failures="0" name="dev.mccue.json.JsonParsingTest" time="0.068" errors="0" skipped="0">
   <properties>
     <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
     <property name="java.vm.version" value="21.0.2+13-58"/>
@@ -57,15 +57,15 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="sun.cpu.endian" value="little"/>
   </properties>
-  <testcase classname="dev.mccue.json.JsonParsingTest" name="dev.mccue.json.JsonParsingTest.testExponentialForms" time="0.001"/>
-  <testcase classname="dev.mccue.json.JsonParsingTest" name="dev.mccue.json.JsonParsingTest.testDecodingObject" time="0.005"/>
-  <testcase classname="dev.mccue.json.JsonParsingTest" name="dev.mccue.json.JsonParsingTest.testReadMultipleTopLevelForms" time="0.017"/>
+  <testcase classname="dev.mccue.json.JsonParsingTest" name="dev.mccue.json.JsonParsingTest.testExponentialForms" time="0"/>
+  <testcase classname="dev.mccue.json.JsonParsingTest" name="dev.mccue.json.JsonParsingTest.testDecodingObject" time="0.002"/>
+  <testcase classname="dev.mccue.json.JsonParsingTest" name="dev.mccue.json.JsonParsingTest.testReadMultipleTopLevelForms" time="0.011"/>
   <testcase classname="dev.mccue.json.JsonParsingTest" name="dev.mccue.json.JsonParsingTest.testNegativesForms" time="0.001"/>
   <testcase classname="dev.mccue.json.JsonParsingTest" name="dev.mccue.json.JsonParsingTest.testRoundTrip" time="0.001"/>
   <testcase classname="dev.mccue.json.JsonParsingTest" name="dev.mccue.json.JsonParsingTest.testEscapeChar" time="0"/>
-  <testcase classname="dev.mccue.json.JsonParsingTest" name="dev.mccue.json.JsonParsingTest.testExtraInputThrows" time="0.021"/>
-  <testcase classname="dev.mccue.json.JsonParsingTest" name="dev.mccue.json.JsonParsingTest.testExtraWhitespaceIsFine" time="0.002"/>
-  <testcase classname="dev.mccue.json.JsonParsingTest" name="dev.mccue.json.JsonParsingTest.testReadMultipleTopLevel" time="0.002"/>
-  <testcase classname="dev.mccue.json.JsonParsingTest" name="dev.mccue.json.JsonParsingTest.testExtremelyBigNumber" time="0.001"/>
-  <testcase classname="dev.mccue.json.JsonParsingTest" name="dev.mccue.json.JsonParsingTest.testNumberEquivalences" time="0.023"/>
+  <testcase classname="dev.mccue.json.JsonParsingTest" name="dev.mccue.json.JsonParsingTest.testExtraInputThrows" time="0.027"/>
+  <testcase classname="dev.mccue.json.JsonParsingTest" name="dev.mccue.json.JsonParsingTest.testExtraWhitespaceIsFine" time="0.004"/>
+  <testcase classname="dev.mccue.json.JsonParsingTest" name="dev.mccue.json.JsonParsingTest.testReadMultipleTopLevel" time="0"/>
+  <testcase classname="dev.mccue.json.JsonParsingTest" name="dev.mccue.json.JsonParsingTest.testExtremelyBigNumber" time="0.002"/>
+  <testcase classname="dev.mccue.json.JsonParsingTest" name="dev.mccue.json.JsonParsingTest.testNumberEquivalences" time="0.02"/>
 </testsuite>
