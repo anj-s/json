@@ -42,7 +42,7 @@
     <property name="org.slf4j.simpleLogger.defaultLogLevel" value="debug"/>
     <property name="java.vm.specification.version" value="21"/>
     <property name="sun.arch.data.model" value="64"/>
-    <property name="sun.java.command" value="org.apache.maven.wrapper.MavenWrapperMain -X clean test jacoco:report jacoco:check"/>
+    <property name="sun.java.command" value="org.apache.maven.wrapper.MavenWrapperMain -X clean test jacoco:report"/>
     <property name="java.home" value="/home/user/jdk-21.0.2"/>
     <property name="user.language" value="en"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>

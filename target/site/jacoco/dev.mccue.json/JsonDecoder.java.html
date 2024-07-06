@@ -69,19 +69,19 @@ public interface JsonDecoder&lt;T extends @Nullable Object&gt; {
     }
 
     static int int_(Json json) throws JsonDecodeException {
-<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        if (!(json instanceof JsonNumber jsonNumber)) {</span>
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        if (!(json instanceof JsonNumber jsonNumber)) {</span>
 <span class="nc" id="L73">            throw JsonDecodeException.of(</span>
                     &quot;expected a number&quot;,
                     json
             );
-<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        } else if (!jsonNumber.isIntegral()) {</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">        } else if (!jsonNumber.isIntegral()) {</span>
 <span class="nc" id="L78">            throw JsonDecodeException.of(</span>
                     &quot;expected a number with no decimal part&quot;,
                     json
             );
         } else {
             try {
-<span class="fc" id="L84">                return jsonNumber.intValueExact();</span>
+<span class="nc" id="L84">                return jsonNumber.intValueExact();</span>
 <span class="nc" id="L85">            } catch (ArithmeticException e) {</span>
 <span class="nc" id="L86">                throw JsonDecodeException.of(</span>
                         &quot;expected a number which could be converted to an int&quot;,
@@ -320,14 +320,14 @@ public interface JsonDecoder&lt;T extends @Nullable Object&gt; {
     }
 
     static &lt;T extends @Nullable Object&gt; T optionalField(Json json, java.lang.String fieldName, JsonDecoder&lt;? extends T&gt; valueDecoder, T defaultValue) throws JsonDecodeException {
-<span class="fc" id="L323">        var jsonObject = object(json);</span>
-<span class="fc" id="L324">        var value = jsonObject.get(fieldName);</span>
-<span class="fc bfc" id="L325" title="All 2 branches covered.">        if (value == null) {</span>
-<span class="fc" id="L326">            return defaultValue;</span>
+<span class="nc" id="L323">        var jsonObject = object(json);</span>
+<span class="nc" id="L324">        var value = jsonObject.get(fieldName);</span>
+<span class="nc bnc" id="L325" title="All 2 branches missed.">        if (value == null) {</span>
+<span class="nc" id="L326">            return defaultValue;</span>
         }
         else {
             try {
-<span class="fc" id="L330">                return valueDecoder.decode(value);</span>
+<span class="nc" id="L330">                return valueDecoder.decode(value);</span>
 <span class="nc" id="L331">            } catch (JsonDecodeException e) {</span>
 <span class="nc" id="L332">                throw JsonDecodeException.atField(</span>
                         fieldName,

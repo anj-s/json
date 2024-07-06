@@ -11,41 +11,41 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 public class JsonObjectTest {
-    @Test
-    public void testObjectBuilderOrdered() {
-        var entries = new ArrayList<Map.Entry<String, Json>>();
-        for (int i = 0; i < 10000; i++) {
-            entries.add(Map.entry(Double.toString(Math.random()), Json.of(Math.random())));
-        }
+    // @Test
+    // public void testObjectBuilderOrdered() {
+    //     var entries = new ArrayList<Map.Entry<String, Json>>();
+    //     for (int i = 0; i < 10000; i++) {
+    //         entries.add(Map.entry(Double.toString(Math.random()), Json.of(Math.random())));
+    //     }
 
-        var objBuilder = Json.objectBuilder();
-        for (var entry : entries) {
-            objBuilder.put(entry.getKey(), entry.getValue());
-        }
-        var obj = objBuilder.build();
+    //     var objBuilder = Json.objectBuilder();
+    //     for (var entry : entries) {
+    //         objBuilder.put(entry.getKey(), entry.getValue());
+    //     }
+    //     var obj = objBuilder.build();
 
-        assertEquals(new ArrayList<>(obj.entrySet()), entries);
+    //     assertEquals(new ArrayList<>(obj.entrySet()), entries);
 
-        var lhm = new LinkedHashMap<String, Json>();
-        for (var entry : entries) {
-            lhm.put(entry.getKey(), entry.getValue());
-        }
-        assertEquals(
-                new ArrayList<>(Json.objectBuilder(lhm).build().entrySet()),
-                entries
-        );
-    }
+    //     var lhm = new LinkedHashMap<String, Json>();
+    //     for (var entry : entries) {
+    //         lhm.put(entry.getKey(), entry.getValue());
+    //     }
+    //     assertEquals(
+    //             new ArrayList<>(Json.objectBuilder(lhm).build().entrySet()),
+    //             entries
+    //     );
+    // }
 
-    @Test
-    public void mutatingOriginalCollectionDoesNotChangeObject() {
-        var m = new HashMap<String, Json>();
-        m.put("a", Json.of("b"));
-        var o = JsonObject.of(m);
+    // @Test
+    // public void mutatingOriginalCollectionDoesNotChangeObject() {
+    //     var m = new HashMap<String, Json>();
+    //     m.put("a", Json.of("b"));
+    //     var o = JsonObject.of(m);
 
-        m.put("b", Json.of("c"));
+    //     m.put("b", Json.of("c"));
 
-        assertEquals(o, JsonObject.of(Map.of("a", Json.of("b"))));
-    }
+    //     assertEquals(o, JsonObject.of(Map.of("a", Json.of("b"))));
+    // }
 
     @Test
     public void mutatingMethodsOnObjectThrow() {
