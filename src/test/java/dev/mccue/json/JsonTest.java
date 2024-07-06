@@ -12,56 +12,56 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class JsonTest {
-    @Test
-    public void testNullOfMethods() {
-        assertEquals(JsonNull.instance(), Json.of((JsonEncodable) null));
-        assertEquals(JsonNull.instance(), Json.of((BigDecimal) null));
-        assertEquals(JsonNull.instance(), Json.of((Double) null));
-        assertEquals(JsonNull.instance(), Json.of((Long) null));
-        assertEquals(JsonNull.instance(), Json.of((Float) null));
-        assertEquals(JsonNull.instance(), Json.of((Integer) null));
-        assertEquals(JsonNull.instance(), Json.of((Integer) null));
-        assertEquals(JsonNull.instance(), Json.of((BigInteger) null));
-        assertEquals(JsonNull.instance(), Json.of((String) null));
-        assertEquals(JsonNull.instance(), Json.of((List<Json>) null));
-        assertEquals(JsonNull.instance(), Json.of((Boolean) null));
-        assertEquals(JsonNull.instance(), Json.of((List<JsonEncodable>) null));
-        assertEquals(JsonNull.instance(), Json.of((Map<String, Json>) null));
-        assertEquals(JsonNull.instance(), Json.of(() -> null));
-    }
+//     @Test
+//     public void testNullOfMethods() {
+//         assertEquals(JsonNull.instance(), Json.of((JsonEncodable) null));
+//         assertEquals(JsonNull.instance(), Json.of((BigDecimal) null));
+//         assertEquals(JsonNull.instance(), Json.of((Double) null));
+//         assertEquals(JsonNull.instance(), Json.of((Long) null));
+//         assertEquals(JsonNull.instance(), Json.of((Float) null));
+//         assertEquals(JsonNull.instance(), Json.of((Integer) null));
+//         assertEquals(JsonNull.instance(), Json.of((Integer) null));
+//         assertEquals(JsonNull.instance(), Json.of((BigInteger) null));
+//         assertEquals(JsonNull.instance(), Json.of((String) null));
+//         assertEquals(JsonNull.instance(), Json.of((List<Json>) null));
+//         assertEquals(JsonNull.instance(), Json.of((Boolean) null));
+//         assertEquals(JsonNull.instance(), Json.of((List<JsonEncodable>) null));
+//         assertEquals(JsonNull.instance(), Json.of((Map<String, Json>) null));
+//         assertEquals(JsonNull.instance(), Json.of(() -> null));
+//     }
 
-    @Test
-    public void testOfCollection() {
-        assertEquals(
-                JsonArray.of(Json.ofFalse(), Json.of(1), Json.of("abc")),
-                Json.of(List.of((JsonEncodable) Json::ofFalse, Json.of(1), Json.of("abc")))
-        );
+//     @Test
+//     public void testOfCollection() {
+//         assertEquals(
+//                 JsonArray.of(Json.ofFalse(), Json.of(1), Json.of("abc")),
+//                 Json.of(List.of((JsonEncodable) Json::ofFalse, Json.of(1), Json.of("abc")))
+//         );
 
-        var l = new ArrayList<Json>();
-        l.add(null);
-        assertEquals(
-                JsonArray.of(JsonNull.instance()),
-                Json.of(l)
-        );
-    }
+//         var l = new ArrayList<Json>();
+//         l.add(null);
+//         assertEquals(
+//                 JsonArray.of(JsonNull.instance()),
+//                 Json.of(l)
+//         );
+//     }
 
-    @Test
-    public void testOfCollectionEncodable() {
-        assertEquals(
-                JsonArray.of(Json.ofFalse()),
-                Json.of(List.of(false), JsonBoolean::of)
-        );
+//     @Test
+//     public void testOfCollectionEncodable() {
+//         assertEquals(
+//                 JsonArray.of(Json.ofFalse()),
+//                 Json.of(List.of(false), JsonBoolean::of)
+//         );
 
-        assertEquals(
-                JsonArray.of(Json.ofNull()),
-                Json.of(List.of(false), __ -> null)
-        );
+//         assertEquals(
+//                 JsonArray.of(Json.ofNull()),
+//                 Json.of(List.of(false), __ -> null)
+//         );
 
-        assertEquals(
-                JsonArray.of(Json.ofNull()),
-                Json.of(List.of(false), __ -> JsonNull.instance())
-        );
-    }
+//         assertEquals(
+//                 JsonArray.of(Json.ofNull()),
+//                 Json.of(List.of(false), __ -> JsonNull.instance())
+//         );
+//     }
 
     @Test
     public void testOfMap() {

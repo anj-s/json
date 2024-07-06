@@ -58,13 +58,13 @@ public sealed interface Json
      * @return An instance of {@link Json}.
      */
     static Json of(@Nullable JsonEncodable value) {
-<span class="fc bfc" id="L61" title="All 2 branches covered.">        if (value == null) {</span>
-<span class="fc" id="L62">            return JsonNull.instance();</span>
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">        if (value == null) {</span>
+<span class="nc" id="L62">            return JsonNull.instance();</span>
         }
         else {
 <span class="fc" id="L65">            var asJson = value.toJson();</span>
-<span class="fc bfc" id="L66" title="All 2 branches covered.">            if (asJson == null) {</span>
-<span class="fc" id="L67">                return JsonNull.instance();</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">            if (asJson == null) {</span>
+<span class="nc" id="L67">                return JsonNull.instance();</span>
             }
             else {
 <span class="fc" id="L70">                return asJson;</span>
@@ -79,7 +79,7 @@ public sealed interface Json
      * @return An instance of {@link Json}.
      */
     static Json of(@Nullable BigDecimal value) {
-<span class="fc bfc" id="L82" title="All 2 branches covered.">        return value == null ? JsonNull.instance() : JsonNumber.of(value);</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">        return value == null ? JsonNull.instance() : JsonNumber.of(value);</span>
     }
 
     /**
@@ -129,7 +129,7 @@ public sealed interface Json
      * @return An instance of {@link Json}.
      */
     static Json of(@Nullable Double value) {
-<span class="pc bpc" id="L132" title="1 of 2 branches missed.">        return value == null ? JsonNull.instance() : of((double) value);</span>
+<span class="nc bnc" id="L132" title="All 2 branches missed.">        return value == null ? JsonNull.instance() : of((double) value);</span>
     }
 
     /**
@@ -139,7 +139,7 @@ public sealed interface Json
      * @return An instance of {@link Json}.
      */
     static Json of(@Nullable Long value) {
-<span class="pc bpc" id="L142" title="1 of 2 branches missed.">        return value == null ? JsonNull.instance() : of((long) value);</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">        return value == null ? JsonNull.instance() : of((long) value);</span>
     }
 
     /**
@@ -149,7 +149,7 @@ public sealed interface Json
      * @return An instance of {@link Json}.
      */
     static Json of(@Nullable Float value) {
-<span class="pc bpc" id="L152" title="1 of 2 branches missed.">        return value == null ? JsonNull.instance() : of((float) value);</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">        return value == null ? JsonNull.instance() : of((float) value);</span>
     }
 
     /**
@@ -169,7 +169,7 @@ public sealed interface Json
      * @return An instance of {@link Json}.
      */
     static Json of(@Nullable BigInteger value) {
-<span class="fc bfc" id="L172" title="All 2 branches covered.">        return value == null ? JsonNull.instance() : JsonNumber.of(value);</span>
+<span class="pc bpc" id="L172" title="1 of 2 branches missed.">        return value == null ? JsonNull.instance() : JsonNumber.of(value);</span>
     }
 
     /**
@@ -179,7 +179,7 @@ public sealed interface Json
      * @return An instance of {@link Json}.
      */
     static Json of(@Nullable String value) {
-<span class="fc bfc" id="L182" title="All 2 branches covered.">        return value == null ? JsonNull.instance() : new StringImpl(value);</span>
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">        return value == null ? JsonNull.instance() : new StringImpl(value);</span>
     }
 
     /**
@@ -224,7 +224,7 @@ public sealed interface Json
      * @return An instance of {@link Json}.
      */
     static Json of(@Nullable Boolean value) {
-<span class="pc bpc" id="L227" title="1 of 2 branches missed.">        return value == null ? JsonNull.instance() : JsonBoolean.of(value);</span>
+<span class="nc bnc" id="L227" title="All 2 branches missed.">        return value == null ? JsonNull.instance() : JsonBoolean.of(value);</span>
     }
 
     /**
@@ -235,11 +235,11 @@ public sealed interface Json
      * @return An instance of {@link Json}.
      */
     static Json of(@Nullable Collection&lt;? extends @Nullable JsonEncodable&gt; value) {
-<span class="fc bfc" id="L238" title="All 2 branches covered.">        return value == null</span>
-<span class="fc" id="L239">                ? JsonNull.instance()</span>
+<span class="pc bpc" id="L238" title="1 of 2 branches missed.">        return value == null</span>
+<span class="nc" id="L239">                ? JsonNull.instance()</span>
 <span class="fc" id="L240">                : new ArrayImpl(</span>
 <span class="fc" id="L241">                        value.stream()</span>
-<span class="fc bfc" id="L242" title="All 2 branches covered.">                                .map(json -&gt; json == null ? JsonNull.instance() : json.toJson())</span>
+<span class="pc bpc" id="L242" title="1 of 2 branches missed.">                                .map(json -&gt; json == null ? JsonNull.instance() : json.toJson())</span>
 <span class="fc" id="L243">                                .toList()</span>
                 );
     }
@@ -255,20 +255,20 @@ public sealed interface Json
             @Nullable Collection&lt;? extends T&gt; value,
             JsonEncoder&lt;T&gt; encoder
     ) {
-<span class="pc bpc" id="L258" title="1 of 2 branches missed.">        return value == null</span>
+<span class="nc bnc" id="L258" title="All 2 branches missed.">        return value == null</span>
 <span class="nc" id="L259">                ? JsonNull.instance()</span>
-<span class="fc" id="L260">                : new ArrayImpl(</span>
-<span class="fc" id="L261">                value.stream()</span>
-<span class="fc" id="L262">                        .map(v -&gt; {</span>
-<span class="fc" id="L263">                            var result = encoder.encode(v);</span>
-<span class="fc bfc" id="L264" title="All 2 branches covered.">                            if (result == null) {</span>
-<span class="fc" id="L265">                                return JsonNull.instance();</span>
+<span class="nc" id="L260">                : new ArrayImpl(</span>
+<span class="nc" id="L261">                value.stream()</span>
+<span class="nc" id="L262">                        .map(v -&gt; {</span>
+<span class="nc" id="L263">                            var result = encoder.encode(v);</span>
+<span class="nc bnc" id="L264" title="All 2 branches missed.">                            if (result == null) {</span>
+<span class="nc" id="L265">                                return JsonNull.instance();</span>
                             }
                             else {
-<span class="fc" id="L268">                                return result;</span>
+<span class="nc" id="L268">                                return result;</span>
                             }
                         })
-<span class="fc" id="L271">                        .toList()</span>
+<span class="nc" id="L271">                        .toList()</span>
         );
     }
 
@@ -286,8 +286,8 @@ public sealed interface Json
      * @return An instance of {@link Json}.
      */
     static Json of(@Nullable Map&lt;String, ? extends @Nullable JsonEncodable&gt; value) {
-<span class="fc bfc" id="L289" title="All 2 branches covered.">        return value == null</span>
-<span class="fc" id="L290">                ? JsonNull.instance()</span>
+<span class="pc bpc" id="L289" title="1 of 2 branches missed.">        return value == null</span>
+<span class="nc" id="L290">                ? JsonNull.instance()</span>
 <span class="fc" id="L291">                : new ObjectImpl(</span>
                         value
 <span class="fc" id="L293">                                .entrySet()</span>

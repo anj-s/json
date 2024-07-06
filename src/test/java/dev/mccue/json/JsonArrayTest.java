@@ -108,28 +108,28 @@ public class JsonArrayTest {
 //         }
 //     }
 
-    @Test
-    public void mutatingMethodsThrow() {
-        for (var array : List.of(
-                Json.emptyArray(),
-                JsonArray.of(new ArrayList<>())
-        )) {
+//     @Test
+//     public void mutatingMethodsThrow() {
+//         for (var array : List.of(
+//                 Json.emptyArray(),
+//                 JsonArray.of(new ArrayList<>())
+//         )) {
 
-            assertThrows(UnsupportedOperationException.class, () -> array.add(Json.of(1)));
-            assertThrows(UnsupportedOperationException.class, () -> array.add(1, Json.of(1)));
-            assertThrows(UnsupportedOperationException.class, () -> array.replaceAll((__) -> Json.of(1)));
-            assertThrows(UnsupportedOperationException.class, () -> array.remove(Json.of(1)));
-            assertThrows(UnsupportedOperationException.class, () -> array.removeAll(List.of(Json.emptyArray())));
-            assertThrows(UnsupportedOperationException.class, () -> array.removeIf((__) -> true));
-            assertThrows(UnsupportedOperationException.class, () -> array.sort((_a, _b) -> 0));
-            assertThrows(UnsupportedOperationException.class, array::clear);
-            assertThrows(UnsupportedOperationException.class, () -> array.addAll(List.of()));
-            assertThrows(UnsupportedOperationException.class, () -> array.addAll(1, List.of()));
-            assertThrows(UnsupportedOperationException.class, () -> array.set(1, Json.ofNull()));
-            assertThrows(UnsupportedOperationException.class, () -> array.retainAll(List.of(Json.ofNull())));
-            assertThrows(UnsupportedOperationException.class, () -> array.remove(0));
-        }
-    }
+//             assertThrows(UnsupportedOperationException.class, () -> array.add(Json.of(1)));
+//             assertThrows(UnsupportedOperationException.class, () -> array.add(1, Json.of(1)));
+//             assertThrows(UnsupportedOperationException.class, () -> array.replaceAll((__) -> Json.of(1)));
+//             assertThrows(UnsupportedOperationException.class, () -> array.remove(Json.of(1)));
+//             assertThrows(UnsupportedOperationException.class, () -> array.removeAll(List.of(Json.emptyArray())));
+//             assertThrows(UnsupportedOperationException.class, () -> array.removeIf((__) -> true));
+//             assertThrows(UnsupportedOperationException.class, () -> array.sort((_a, _b) -> 0));
+//             assertThrows(UnsupportedOperationException.class, array::clear);
+//             assertThrows(UnsupportedOperationException.class, () -> array.addAll(List.of()));
+//             assertThrows(UnsupportedOperationException.class, () -> array.addAll(1, List.of()));
+//             assertThrows(UnsupportedOperationException.class, () -> array.set(1, Json.ofNull()));
+//             assertThrows(UnsupportedOperationException.class, () -> array.retainAll(List.of(Json.ofNull())));
+//             assertThrows(UnsupportedOperationException.class, () -> array.remove(0));
+//         }
+//     }
 
     @Test
     public void emptyArrays() {

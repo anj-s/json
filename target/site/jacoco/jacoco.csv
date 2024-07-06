@@ -17,7 +17,7 @@ json,dev.mccue.json.internal,ObjectBuilder,26,36,3,1,4,7,5,5,3,5
 json,dev.mccue.json.internal,StringImpl,33,41,2,2,7,10,9,6,7,6
 json,dev.mccue.json.serialization,JsonSerializationProxy,0,13,0,0,0,4,0,2,0,2
 json,dev.mccue.json,JsonReader,0,17,0,0,0,5,0,2,0,2
-json,dev.mccue.json,Json,122,307,10,32,27,84,17,55,8,43
+json,dev.mccue.json,Json,180,249,25,17,44,67,32,40,14,37
 json,dev.mccue.json,JsonInteger,0,3,0,0,0,1,0,1,0,1
 json,dev.mccue.json,JsonReader.new Iterator() {...},4,42,3,7,1,10,3,5,0,3
 json,dev.mccue.json,JsonNumber,24,80,5,7,5,15,6,10,1,9

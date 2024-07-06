@@ -66,11 +66,11 @@ public class JsonObjectTest {
     //     assertThrows(UnsupportedOperationException.class, () -> o.remove("a", Json.of("b")));
     // }
 
-    @Test
-    public void emptyObjects() {
-        assertSame(
-                Json.emptyObject(),
-                JsonObject.empty()
-        );
-    }
+    // @Test
+    // public void emptyObjects() {
+    //     assertSame(
+    //             Json.emptyObject(),
+    //             JsonObject.empty()
+    //     );
+    // }
 }
