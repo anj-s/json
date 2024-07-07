@@ -30,20 +30,58 @@ public class JsonTest {
 //         assertEquals(JsonNull.instance(), Json.of(() -> null));
 //     }
 
-//     @Test
-//     public void testOfCollection() {
-//         assertEquals(
-//                 JsonArray.of(Json.ofFalse(), Json.of(1), Json.of("abc")),
-//                 Json.of(List.of((JsonEncodable) Json::ofFalse, Json.of(1), Json.of("abc")))
-//         );
-
-//         var l = new ArrayList<Json>();
-//         l.add(null);
-//         assertEquals(
-//                 JsonArray.of(JsonNull.instance()),
-//                 Json.of(l)
-//         );
-//     }
+     @Test
+      public void testOfCollection() {
+          var c = new ArrayList<JsonEncodable>();
+          c.add(null);
+          c.add(Json.of(1));
+          c.add(Json.of(2));
+          c.add(Json.of(3));
+          c.add(Json.of(4));
+          c.add(Json.of(5));
+          c.add(Json.of(6));
+          c.add(Json.of(7));
+          c.add(Json.of(8));
+          c.add(Json.of(9));
+          c.add(Json.of(10));
+          c.add(Json.of(11));
+          c.add(Json.of(12));
+          c.add(Json.of(13));
+          c.add(Json.of(14));
+          c.add(Json.of(15));
+          c.add(Json.of(16));
+          c.add(Json.of(17));
+          c.add(Json.of(18));
+          c.add(Json.of(19));
+          c.add(Json.of(20));
+  
+          assertEquals(
+                  JsonArray.of(
+                          JsonNull.instance(),
+                          Json.of(1),
+                          Json.of(2),
+                          Json.of(3),
+                          Json.of(4),
+                          Json.of(5),
+                          Json.of(6),
+                          Json.of(7),
+                          Json.of(8),
+                          Json.of(9),
+                          Json.of(10),
+                          Json.of(11),
+                          Json.of(12),
+                          Json.of(13),
+                          Json.of(14),
+                          Json.of(15),
+                          Json.of(16),
+                          Json.of(17),
+                          Json.of(18),
+                          Json.of(19),
+                          Json.of(20)
+                  ),
+                  Json.of(c)
+          );
+      }
 
 //     @Test
 //     public void testOfCollectionEncodable() {

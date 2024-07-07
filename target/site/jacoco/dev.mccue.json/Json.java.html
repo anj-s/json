@@ -239,7 +239,7 @@ public sealed interface Json
 <span class="nc" id="L239">                ? JsonNull.instance()</span>
 <span class="fc" id="L240">                : new ArrayImpl(</span>
 <span class="fc" id="L241">                        value.stream()</span>
-<span class="pc bpc" id="L242" title="1 of 2 branches missed.">                                .map(json -&gt; json == null ? JsonNull.instance() : json.toJson())</span>
+<span class="fc bfc" id="L242" title="All 2 branches covered.">                                .map(json -&gt; json == null ? JsonNull.instance() : json.toJson())</span>
 <span class="fc" id="L243">                                .toList()</span>
                 );
     }
