@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="9" failures="0" name="dev.mccue.json.JsonGeneratorTest" time="0.067" errors="0" skipped="0">
+<testsuite tests="9" failures="0" name="dev.mccue.json.JsonGeneratorTest" time="0.069" errors="0" skipped="0">
   <properties>
     <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
     <property name="java.vm.version" value="21.0.2+13-58"/>
@@ -59,11 +59,11 @@
   </properties>
   <testcase classname="dev.mccue.json.JsonGeneratorTest" name="dev.mccue.json.JsonGeneratorTest.testJsonGeneratorNull" time="0"/>
   <testcase classname="dev.mccue.json.JsonGeneratorTest" name="dev.mccue.json.JsonGeneratorTest.testJsonGeneratorTrue" time="0"/>
-  <testcase classname="dev.mccue.json.JsonGeneratorTest" name="dev.mccue.json.JsonGeneratorTest.testJsonGeneratorFalse" time="0"/>
-  <testcase classname="dev.mccue.json.JsonGeneratorTest" name="dev.mccue.json.JsonGeneratorTest.testJsonGeneratorArray" time="0"/>
-  <testcase classname="dev.mccue.json.JsonGeneratorTest" name="dev.mccue.json.JsonGeneratorTest.testJsonGeneratorObject" time="0.007"/>
-  <testcase classname="dev.mccue.json.JsonGeneratorTest" name="dev.mccue.json.JsonGeneratorTest.testJsonGeneratorString" time="0.034"/>
-  <testcase classname="dev.mccue.json.JsonGeneratorTest" name="dev.mccue.json.JsonGeneratorTest.testJsonGeneratorNumber" time="0.009"/>
-  <testcase classname="dev.mccue.json.JsonGeneratorTest" name="dev.mccue.json.JsonGeneratorTest.testJsonGeneratorEncodable" time="0.005"/>
-  <testcase classname="dev.mccue.json.JsonGeneratorTest" name="dev.mccue.json.JsonGeneratorTest.testJsonGeneratorComplex" time="0.012"/>
+  <testcase classname="dev.mccue.json.JsonGeneratorTest" name="dev.mccue.json.JsonGeneratorTest.testJsonGeneratorFalse" time="0.001"/>
+  <testcase classname="dev.mccue.json.JsonGeneratorTest" name="dev.mccue.json.JsonGeneratorTest.testJsonGeneratorArray" time="0.017"/>
+  <testcase classname="dev.mccue.json.JsonGeneratorTest" name="dev.mccue.json.JsonGeneratorTest.testJsonGeneratorObject" time="0.004"/>
+  <testcase classname="dev.mccue.json.JsonGeneratorTest" name="dev.mccue.json.JsonGeneratorTest.testJsonGeneratorString" time="0.026"/>
+  <testcase classname="dev.mccue.json.JsonGeneratorTest" name="dev.mccue.json.JsonGeneratorTest.testJsonGeneratorNumber" time="0.007"/>
+  <testcase classname="dev.mccue.json.JsonGeneratorTest" name="dev.mccue.json.JsonGeneratorTest.testJsonGeneratorEncodable" time="0.001"/>
+  <testcase classname="dev.mccue.json.JsonGeneratorTest" name="dev.mccue.json.JsonGeneratorTest.testJsonGeneratorComplex" time="0.013"/>
 </testsuite>

@@ -6,6 +6,7 @@
 /home/user/json/src/test/java/dev/mccue/json/JsonGeneratorTest.java
 /home/user/json/src/test/java/dev/mccue/json/SerializationTest.java
 /home/user/json/src/test/java/dev/mccue/json/JsonStringTest.java
+/home/user/json/src/test/java/dev/mccue/json/JsonEncoderTest.java
 /home/user/json/src/test/java/dev/mccue/json/JsonDecoderTest.java
 /home/user/json/src/test/java/dev/mccue/json/JsonTest.java
 /home/user/json/src/test/java/dev/mccue/json/JsonObjectTest.java
